@@ -1,0 +1,4 @@
+ColetorLixo
+===========
+
+Trabalho de IA
