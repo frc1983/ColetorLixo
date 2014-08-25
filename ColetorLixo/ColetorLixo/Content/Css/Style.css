@@ -1,0 +1,60 @@
+﻿body {
+    width: 960px;
+    margin: 0 auto;
+    font-family: Arial;
+    font-size: 14px;
+}
+
+.matrix {
+    margin: 0 0 0 35px;
+}
+
+th {
+    background-color: lightgray;
+    width: 25px;
+    height: 25px;
+    font-weight: 100;
+}
+
+tr {
+    font-size: 20px;
+    font-weight: 100;
+    text-align: center;
+}
+
+td {
+    border: 1px solid #ccc;
+}
+
+.clear {
+    clear: both;
+}
+
+.left {
+    float: left;
+}
+
+.input {
+    border: 1px solid #9b9b9b;
+    min-width: 200px;
+    min-height: 25px;
+}
+
+.button {
+    width: 59px;
+    height: 25px;
+    border: 1px solid #9b9b9b;
+    background-color: #cacaca;
+    margin: 10px 10px 10px 2px;
+}
+
+.textarea {
+    resize: none;
+    width: 198px;
+    height: 325px;
+}
+
+label {
+    display: block;
+    margin: 5px 0 5px 5px;
+}

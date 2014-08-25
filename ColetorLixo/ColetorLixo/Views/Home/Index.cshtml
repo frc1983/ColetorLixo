@@ -1,0 +1,80 @@
+﻿@{
+    ViewBag.Title = "Coletor de Lixo";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h2>Coletor de Lixo</h2>
+
+<div class="controls left">
+    <label for="interval">Intervalo (em segundos)</label>
+    <input type="number" id="interval" class="input" />
+    <br />
+    <input id="start" type="button" value="start" class="button left" />
+    <input id="pause" type="button" value="pause" class="button left" />
+    <input id="stop" type="button" value="stop" class="button" />
+</div>
+
+<div class="matrix left">
+    <label for="log">Ambiente</label>
+    <div id="container"></div>
+</div>
+
+<script type="text/javascript">
+    $(document).ready(function () {
+        DrawTable();
+        var timer = null;
+
+        $("#start").click(function () {
+            if (timer !== null) return;
+
+            var interval = $("#interval").val();
+
+            if (interval < 1 || interval > 60) {
+                alert("O intervalo deve estar entre 1 e 60");
+                return;
+            }
+
+            timer = setInterval(CallPopulateMatrix, interval * 1000);
+        });
+
+        $("#pause").click(function () {
+            clearInterval(timer);
+            timer = null;
+        });
+
+        $("#stop").click(function () {
+            location.reload();
+        });
+    });
+
+    function CallPopulateMatrix() {
+        $.ajax({
+            dataType: "json",
+            async: true,
+            url: '@Url.Action("PopulateMatrix")',
+            success: function (data) {
+                $("#container").html(data.Html);
+
+                if (data.Complete === "True")
+                    $("#pause").trigger("click");
+            },
+            error: function () {
+                alert("Nenhum dado recebido.");
+            }
+        });
+    }
+
+    function DrawTable() {
+        $.ajax({
+            dataType: "json",
+            async: true,
+            url: '@Url.Action("DrawTable")',
+            success: function (data) {
+                $("#container").html(data.Html);
+            },
+            error: function () {
+                alert("Nenhum dado recebido.");
+            }
+        });
+    }
+</script>
