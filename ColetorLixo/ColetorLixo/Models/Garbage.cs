@@ -9,11 +9,47 @@ namespace ColetorLixo.Models
     {
         public String type;
         public int capacity;
-        public int level { get; set; }
+        public int level;
+        public Boolean full;
 
-        public Garbage(String type, int capacity){
+        public Garbage(String type, int capacity)
+        {
             this.type = type;
             this.capacity = capacity;
+            full = false;
+        }
+
+        public String getType()
+        {
+            return type;
+        }
+
+        public int getCapacity()
+        {
+            return capacity;
+        }
+
+        public int getLevel()
+        {
+            return level;
+        }
+
+        public Boolean addLevel(int plus)
+        {
+            if (plus <= (capacity - level))
+            {
+                level += plus;
+                if (level == capacity)
+                    full = true;
+                return true;
+            }
+            return false;
+
+        }
+
+        public Boolean getFull()
+        {
+            return full;
         }
     }
 }
