@@ -8,7 +8,16 @@ namespace ColetorLixo.Models
     public class Agent
     {
 
-        public Cell position { get; set; }
+        public Cell position;
+
+        public Agent(Cell position)
+        {
+            this.position = position;
+        }
+
+        public Cell getPosition(){
+            return position;
+        }
 
         }
 }

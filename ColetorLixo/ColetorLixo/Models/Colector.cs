@@ -5,24 +5,18 @@ using System.Web;
 
 namespace ColetorLixo.Models
 {
-    public class Garbage : Agent
+    public class Colector : Agent
     {
-        public String type;
         public int capacity;
         public int level;
+        public int battery;
         public Boolean full;
 
-        public Garbage(String type, int capacity)
+        public Colector(int capacity, int battery)
         {
             super();
-            this.type = type;
             this.capacity = capacity;
-            full = false;
-        }
-
-        public String getType()
-        {
-            return type;
+            this.battery = battery;
         }
 
         public int getCapacity()
@@ -40,6 +34,18 @@ namespace ColetorLixo.Models
             return full;
         }
 
+        public int getBattery()
+        {
+            return battery;
+        }
+
+        public void setPosition(Cell position)
+        {
+            super.position = position;
+            battery--;
+            
+        }
+
         public Boolean addLevel(int plus)
         {
             if (plus <= (capacity - level))
@@ -52,5 +58,6 @@ namespace ColetorLixo.Models
             return false;
 
         }
+
     }
 }
