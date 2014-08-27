@@ -11,14 +11,10 @@ namespace ColetorLixo.Models
         public int X { get; set; }
         public int Y { get; set; }
 
-        public Cell()
+        public Cell(Cell position)
         {
-        }
-
-        public Cell(int x, int y)
-        {
-            this.X = x;
-            this.Y = y;
+            this.X = position.X;
+            this.Y = position.Y;
         }
     }
 }
