@@ -12,9 +12,9 @@ namespace ColetorLixo.Models
         public int battery;
         public Boolean full;
 
-        public Colector(int capacity, int battery)
+
+        public Colector(int capacity, int battery, Cell position) : base(position)
         {
-            super();
             this.capacity = capacity;
             this.battery = battery;
         }
@@ -41,7 +41,7 @@ namespace ColetorLixo.Models
 
         public void setPosition(Cell position)
         {
-            super.position = position;
+            this.position = position;
             battery--;
             
         }

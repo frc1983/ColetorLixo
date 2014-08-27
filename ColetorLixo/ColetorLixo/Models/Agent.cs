@@ -15,9 +15,11 @@ namespace ColetorLixo.Models
             this.position = position;
         }
 
-        public Cell getPosition(){
+        public Cell getPosition()
+        {
             return position;
         }
 
-        }
+       
+    }
 }
