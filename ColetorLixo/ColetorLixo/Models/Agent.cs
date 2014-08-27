@@ -7,6 +7,8 @@ namespace ColetorLixo.Models
 {
     public class Agent : Cell
     {
+        #region Properties
+
         public EnumAgentType AgentType { get; set; }
         public int GarbageCapacity { get; set; }
         public int GarbageLoad { get; set; }
@@ -29,6 +31,21 @@ namespace ColetorLixo.Models
             }
 
         }
+
+        #endregion
+
+        #region Constructor
+
+        public Agent(int x, int y, EnumAgentType type, int garbageCapacity, int garbageLoad = 0) : base(x, y)
+        {
+            this.AgentType = type;
+            this.GarbageCapacity = garbageCapacity;
+            this.GarbageLoad = garbageLoad;
+        }
+
+        #endregion
+
+        #region Methods
 
         private string TrashIconUrl(Models.Agent agent)
         {
@@ -60,11 +77,6 @@ namespace ColetorLixo.Models
             return null;
         }
 
-        public Agent(int x, int y, EnumAgentType type, int garbageCapacity, int garbageLoad = 0) : base(x, y)
-        {
-            this.AgentType = type;
-            this.GarbageCapacity = garbageCapacity;
-            this.GarbageLoad = garbageLoad;
-        }
+        #endregion
     }
 }
