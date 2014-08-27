@@ -23,12 +23,15 @@ namespace ColetorLixo.Controllers
             TempData.Keep("matrixVM");
 
             matrixVM.AddTrash(0, 0, EnumGarbageType.Metal);
-            matrixVM.AddTrash(1, 0, EnumGarbageType.Papel);
-            matrixVM.AddTrash(2, 0, EnumGarbageType.Plastico);
-            matrixVM.AddTrash(3, 0, EnumGarbageType.Vidro);
+            matrixVM.AddTrash(1, 0, EnumGarbageType.Paper);
+            matrixVM.AddTrash(2, 0, EnumGarbageType.Plastic);
+            matrixVM.AddTrash(3, 0, EnumGarbageType.Glass);
             matrixVM.AddCharger(1, 1);
             matrixVM.AddCollector(2, 2);
-            matrixVM.AddGarbage(3, 3, EnumGarbageType.Vidro);
+            matrixVM.AddGarbage(3, 3, EnumGarbageType.Glass);
+            matrixVM.AddGarbage(3, 4, EnumGarbageType.Plastic);
+            matrixVM.AddGarbage(3, 5, EnumGarbageType.Paper);
+            matrixVM.AddGarbage(3, 6, EnumGarbageType.Metal);
 
             return View();
         }

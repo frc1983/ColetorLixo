@@ -23,7 +23,7 @@ namespace ColetorLixo.Models
                 else if (this.AgentType.Equals(EnumAgentType.COLLECTOR))
                     return "Content/Images/collector.png";
                 else if (this.AgentType.Equals(EnumAgentType.GARBAGE))
-                    return "Content/Images/garbage.png";
+                    return GarbageIconUrl(this);
 
                 return null;
             }
@@ -35,12 +35,27 @@ namespace ColetorLixo.Models
             Trash garbage = this as Trash;
             if (garbage.GarbageType.Equals(EnumGarbageType.Metal))
                 return "Content/Images/trash_open_metal.png";
-            else if (garbage.GarbageType.Equals(EnumGarbageType.Papel))
+            else if (garbage.GarbageType.Equals(EnumGarbageType.Paper))
                 return "Content/Images/trash_open_paper.png";
-            else if (garbage.GarbageType.Equals(EnumGarbageType.Plastico))
+            else if (garbage.GarbageType.Equals(EnumGarbageType.Plastic))
                 return "Content/Images/trash_open_plastic.png";
-            else if (garbage.GarbageType.Equals(EnumGarbageType.Vidro))
+            else if (garbage.GarbageType.Equals(EnumGarbageType.Glass))
                 return "Content/Images/trash_open_glass.png";
+
+            return null;
+        }
+
+        private string GarbageIconUrl(Models.Agent agent)
+        {
+            Garbage garbage = this as Garbage;
+            if (garbage.GarbageType.Equals(EnumGarbageType.Metal))
+                return "Content/Images/garbage_metal.png";
+            else if (garbage.GarbageType.Equals(EnumGarbageType.Paper))
+                return "Content/Images/garbage_paper.png";
+            else if (garbage.GarbageType.Equals(EnumGarbageType.Plastic))
+                return "Content/Images/garbage_plastic.png";
+            else if (garbage.GarbageType.Equals(EnumGarbageType.Glass))
+                return "Content/Images/garbage_glass.png";
 
             return null;
         }

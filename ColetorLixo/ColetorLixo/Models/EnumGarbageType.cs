@@ -8,9 +8,9 @@ namespace ColetorLixo.Models
 {
     public enum EnumGarbageType
     {
-        Vidro,
-        Plastico,
+        Glass,
+        Plastic,
         Metal,
-        Papel
+        Paper
     }
 }
