@@ -5,10 +5,8 @@ using System.Web;
 
 namespace ColetorLixo.Models
 {
-    public class Agent
+    public class Agent : Cell
     {
 
-        public Cell position { get; set; }
-
-        }
+    }
 }

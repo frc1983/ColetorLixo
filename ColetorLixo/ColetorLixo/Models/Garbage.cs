@@ -5,15 +5,15 @@ using System.Web;
 
 namespace ColetorLixo.Models
 {
-    public class Garbage : Agent
+    public class Garbage : Cell
     {
-        public String type;
-        public int capacity;
-        public int level { get; set; }
+        public EnumGarbageType GarbageType;
+        public int Capacity;
+        public int Level { get; set; }
 
-        public Garbage(String type, int capacity){
-            this.type = type;
-            this.capacity = capacity;
+        public Garbage(EnumGarbageType type, int capacity){
+            GarbageType = type;
+            Capacity = capacity;
         }
     }
 }

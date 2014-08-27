@@ -5,9 +5,9 @@ using System.Web;
 
 namespace ColetorLixo.Models
 {
-    public class Charger: Agent
+    public class Charger: Cell
     {
-        public Boolean positionOne { get; set; }
-        public Boolean positionTwo { get; set; }
+        public Boolean UsedPositionOne { get; set; }
+        public Boolean UsedPositionTwo { get; set; }
     }
 }
