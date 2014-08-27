@@ -12,7 +12,7 @@ namespace ColetorLixo.ViewModels
     {
         #region Properties
 
-        public Cell[,] Matrix;
+        public Cell[,] Ambient;
         public StringBuilder Html { get; set; }
 
         #endregion
@@ -21,15 +21,41 @@ namespace ColetorLixo.ViewModels
 
         public MatrixViewModel(int matrixSizeWidth, int matrixSizeHeight)
         {
-            Matrix = new Cell[matrixSizeWidth, matrixSizeHeight];
+            Ambient = new Cell[matrixSizeWidth, matrixSizeHeight];
 
-            for (int i = 0; i < Matrix.GetLength(0); i++)
-                for (int j = 0; j < Matrix.GetLength(1); j++)
-                {
-                    Matrix[i, j] = new Cell(i, j);
-                }
+            for (int i = 0; i < Ambient.GetLength(0); i++)
+                for (int j = 0; j < Ambient.GetLength(1); j++)
+                    Ambient[i, j] = new Cell(i, j);
         }
 
-        #endregion        
+        internal void AddCollector(int x, int y)
+        {
+            AddAgent(new Collector(x, y, 10, 10));
+        }
+
+        internal void AddGarbage(int x, int y, EnumGarbageType garbageType)
+        {
+            AddAgent(new Garbage(x, y, garbageType, EnumAgentType.GARBAGE));
+        }
+
+        public void AddTrash(int x, int y, EnumGarbageType garbageType)
+        {
+            AddAgent(new Trash(x, y, 10, garbageType));
+        }
+
+        public void AddCharger(int x, int y)
+        {
+            AddAgent(new Charger(x, y, 2));
+        }
+
+        private void AddAgent(Agent agent)
+        {
+            for (int i = 0; i < Ambient.GetLength(0); i++)
+                for (int j = 0; j < Ambient.GetLength(1); j++)
+                    if (i.Equals(agent.X) && j.Equals(agent.Y))
+                        Ambient[i, j].Agent = agent;
+        }
+
+        #endregion
     }
 }

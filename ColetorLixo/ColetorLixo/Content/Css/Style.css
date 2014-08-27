@@ -11,12 +11,13 @@
 
 th {
     background-color: lightgray;
-    width: 25px;
-    height: 25px;
+    width: 35px;
+    height: 35px;
     font-weight: 100;
 }
 
 tr {
+    height: 35px;
     font-size: 20px;
     font-weight: 100;
     text-align: center;
@@ -24,6 +25,11 @@ tr {
 
 td {
     border: 1px solid #ccc;
+}
+
+td img{
+    width: 25px;
+    padding: 5px 10px 0 10px;
 }
 
 .clear {

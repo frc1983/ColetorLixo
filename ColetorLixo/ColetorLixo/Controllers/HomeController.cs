@@ -1,4 +1,5 @@
-﻿using ColetorLixo.Utils;
+﻿using ColetorLixo.Models;
+using ColetorLixo.Utils;
 using ColetorLixo.ViewModels;
 using System;
 using System.Collections.Generic;
@@ -20,6 +21,14 @@ namespace ColetorLixo.Controllers
 
             TempData["matrixVM"] = matrixVM;
             TempData.Keep("matrixVM");
+
+            matrixVM.AddTrash(0, 0, EnumGarbageType.Metal);
+            matrixVM.AddTrash(1, 0, EnumGarbageType.Papel);
+            matrixVM.AddTrash(2, 0, EnumGarbageType.Plastico);
+            matrixVM.AddTrash(3, 0, EnumGarbageType.Vidro);
+            matrixVM.AddCharger(1, 1);
+            matrixVM.AddCollector(2, 2);
+            matrixVM.AddGarbage(3, 3, EnumGarbageType.Vidro);
 
             return View();
         }

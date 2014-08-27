@@ -1,4 +1,5 @@
-﻿using ColetorLixo.ViewModels;
+﻿using ColetorLixo.Models;
+using ColetorLixo.ViewModels;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -23,7 +24,7 @@ namespace ColetorLixo.Utils
         private static void BuildHeader(MatrixViewModel matrixVM)
         {
             matrixVM.Html.Append("<thead><th class='black'></th>");
-            for (int i = 0; i < matrixVM.Matrix.GetLength(0); i++)
+            for (int i = 0; i < matrixVM.Ambient.GetLength(0); i++)
             {
                 matrixVM.Html.Append("<th> " + (i + 1) + "</th>");
             }
@@ -32,12 +33,18 @@ namespace ColetorLixo.Utils
 
         private static void BuildBody(MatrixViewModel matrixVM)
         {
-            for (int i = 0; i < matrixVM.Matrix.GetLength(0); i++)
+            for (int i = 0; i < matrixVM.Ambient.GetLength(0); i++)
             {
                 matrixVM.Html.Append("<tr><td> " + (i + 1) + "</td>");
 
-                for (int j = 0; j < matrixVM.Matrix.GetLength(1); j++)
-                    matrixVM.Html.Append("<td></td>");
+                for (int j = 0; j < matrixVM.Ambient.GetLength(1); j++)
+                {
+                    Cell local = matrixVM.Ambient[i, j];
+                    if(local.Agent != null && !string.IsNullOrEmpty(local.Agent.ImagePath))
+                        matrixVM.Html.Append("<td><img src= '" + local.Agent.ImagePath + "' alt='Image' /></td>");
+                    else
+                        matrixVM.Html.Append("<td></td>");
+                }
 
                 matrixVM.Html.Append("</tr>");
             }
