@@ -22,29 +22,33 @@ namespace ColetorLixo.Controllers
             TempData["matrixVM"] = matrixVM;
             TempData.Keep("matrixVM");
 
-            matrixVM.AddTrash(0, 0, EnumGarbageType.Metal);
-            matrixVM.AddTrash(1, 0, EnumGarbageType.Paper);
-            matrixVM.AddTrash(2, 0, EnumGarbageType.Plastic);
-            matrixVM.AddTrash(3, 0, EnumGarbageType.Glass);
-            matrixVM.AddCharger(1, 1);
-            matrixVM.AddCollector(2, 2);
-            matrixVM.AddGarbage(3, 3, EnumGarbageType.Glass);
-            matrixVM.AddGarbage(3, 4, EnumGarbageType.Plastic);
-            matrixVM.AddGarbage(3, 5, EnumGarbageType.Paper);
-            matrixVM.AddGarbage(3, 6, EnumGarbageType.Metal);
+            matrixVM.AddCollector(0, 0);
+
+            matrixVM.AddTrash(RandomPositions.GetNextX(matrixVM.Ambient), RandomPositions.GetNextY(matrixVM.Ambient), EnumGarbageType.Metal);
+            matrixVM.AddTrash(RandomPositions.GetNextX(matrixVM.Ambient), RandomPositions.GetNextY(matrixVM.Ambient), EnumGarbageType.Paper);
+            matrixVM.AddTrash(RandomPositions.GetNextX(matrixVM.Ambient), RandomPositions.GetNextY(matrixVM.Ambient), EnumGarbageType.Plastic);
+            matrixVM.AddTrash(RandomPositions.GetNextX(matrixVM.Ambient), RandomPositions.GetNextY(matrixVM.Ambient), EnumGarbageType.Glass);
+            matrixVM.AddCharger(RandomPositions.GetNextX(matrixVM.Ambient), RandomPositions.GetNextY(matrixVM.Ambient));
+            matrixVM.AddGarbage(RandomPositions.GetNextX(matrixVM.Ambient), RandomPositions.GetNextY(matrixVM.Ambient), EnumGarbageType.Glass);
+            matrixVM.AddGarbage(RandomPositions.GetNextX(matrixVM.Ambient), RandomPositions.GetNextY(matrixVM.Ambient), EnumGarbageType.Plastic);
+            matrixVM.AddGarbage(RandomPositions.GetNextX(matrixVM.Ambient), RandomPositions.GetNextY(matrixVM.Ambient), EnumGarbageType.Paper);
+            matrixVM.AddGarbage(RandomPositions.GetNextX(matrixVM.Ambient), RandomPositions.GetNextY(matrixVM.Ambient), EnumGarbageType.Metal);
 
             return View();
         }
 
-        //Altera a posição do coletor e manda para desenhar na tela
         public JsonResult PopulateMatrix()
         {
             GetMatrix();
-            //TODO: Criar alteracoes do ColetorLixo ambiente
+
+            //Pega todos coletores e move eles
+            List<Cell> collectors = matrixVM.GetCollectors();
+            foreach (Cell colCell in collectors)
+                Collector.MoveCollector(matrixVM, colCell);
+            
             return DrawTable(true);
         }
 
-        //Desenha a tablea com a matriz e envia para a view
         public JsonResult DrawTable(bool? update)
         {
             if (!update.HasValue)

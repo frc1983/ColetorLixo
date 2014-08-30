@@ -1,5 +1,5 @@
 ﻿body {
-    width: 960px;
+    width: 1115px;
     margin: 0 auto;
     font-family: Arial;
     font-size: 14px;
@@ -11,13 +11,13 @@
 
 th {
     background-color: lightgray;
-    width: 35px;
-    height: 35px;
+    width: 50px;
+    height: 50px;
     font-weight: 100;
 }
 
 tr {
-    height: 35px;
+    height: 50px;
     font-size: 20px;
     font-weight: 100;
     text-align: center;

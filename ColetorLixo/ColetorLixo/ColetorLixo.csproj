@@ -135,6 +135,7 @@
     <Compile Include="Models\Trash.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Utils\ConstructTable.cs" />
+    <Compile Include="Utils\RandomPositions.cs" />
     <Compile Include="ViewModels\MatrixViewModel.cs" />
   </ItemGroup>
   <ItemGroup>

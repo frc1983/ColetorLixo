@@ -1,4 +1,5 @@
 ﻿using ColetorLixo.Models;
+using ColetorLixo.Utils;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -28,6 +29,10 @@ namespace ColetorLixo.ViewModels
                     Ambient[i, j] = new Cell(i, j);
         }
 
+        #endregion
+
+        #region Methods
+
         internal void AddCollector(int x, int y)
         {
             AddAgent(new Collector(x, y, 10, 10));
@@ -38,12 +43,12 @@ namespace ColetorLixo.ViewModels
             AddAgent(new Garbage(x, y, garbageType, EnumAgentType.GARBAGE));
         }
 
-        public void AddTrash(int x, int y, EnumGarbageType garbageType)
+        internal void AddTrash(int x, int y, EnumGarbageType garbageType)
         {
             AddAgent(new Trash(x, y, 10, garbageType));
         }
 
-        public void AddCharger(int x, int y)
+        internal void AddCharger(int x, int y)
         {
             AddAgent(new Charger(x, y, 2));
         }
@@ -52,8 +57,29 @@ namespace ColetorLixo.ViewModels
         {
             for (int i = 0; i < Ambient.GetLength(0); i++)
                 for (int j = 0; j < Ambient.GetLength(1); j++)
-                    if (i.Equals(agent.X) && j.Equals(agent.Y))
+                    if (i.Equals(agent.X) && j.Equals(agent.Y) && Ambient[i, j].Agent == null)
                         Ambient[i, j].Agent = agent;
+                    else if (i.Equals(agent.X) && j.Equals(agent.Y) && Ambient[i, j].Agent != null)
+                    {
+                        agent.X = RandomPositions.GetNextX(Ambient);
+                        agent.Y = RandomPositions.GetNextY(Ambient);
+                        AddAgent(agent);
+                        return;
+                    }
+        }        
+
+        internal List<Cell> GetCollectors()
+        {
+            List<Cell> list = new List<Cell>();
+
+            for (int i = 0; i < Ambient.GetLength(0); i++)
+                for (int j = 0; j < Ambient.GetLength(1); j++)
+                {
+                    if (Ambient[i, j].Agent != null && Ambient[i, j].Agent.AgentType.Equals(EnumAgentType.COLLECTOR))
+                        list.Add(Ambient[i, j]);
+                }
+
+            return list;
         }
 
         #endregion
