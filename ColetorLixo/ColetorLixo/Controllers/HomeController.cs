@@ -44,7 +44,7 @@ namespace ColetorLixo.Controllers
             //Pega todos coletores e move eles
             List<Cell> collectors = matrixVM.GetCollectors();
             foreach (Cell colCell in collectors)
-                Collector.MoveCollector(matrixVM, colCell);
+                ((Collector)colCell.Agent).MoveCollector(matrixVM, colCell);
             
             return DrawTable(true);
         }
