@@ -8,11 +8,17 @@ namespace ColetorLixo.Models
 {
     public class Collector : Agent
     {
+        #region Properties
+
         public int BatteryLevel { get; set; }
         public EnumCollectorStates ActualState { get; set; }
         public List<Garbage> GarbageInside { get; set; }
         public List<Charger> Chargers { get; set; }
         public List<Trash> Trashes { get; set; }
+
+        #endregion
+
+        #region Constructor
 
         public Collector(int x, int y, int capacity, int battery)
             : base(x, y, EnumAgentType.COLLECTOR, capacity)
@@ -24,6 +30,10 @@ namespace ColetorLixo.Models
             Trashes = new List<Trash>();
             FullLoad = false;
         }
+
+        #endregion
+
+        #region Methods
 
         public void MoveCollector(MatrixViewModel matrixVM, Cell colCell)
         {
@@ -63,6 +73,7 @@ namespace ColetorLixo.Models
         }
 
         #region Garbage Methods
+
         public void AddGarbageLoad(Garbage garbage, int load)
         {
             if (!FullLoad && load <= (GarbageCapacity - GarbageLoad))
@@ -80,9 +91,11 @@ namespace ColetorLixo.Models
 
             return ret;
         }
+
         #endregion
 
         #region Charger Methods
+
         private Boolean IsNeedCharge()
         {
             if (BatteryLevel == (FindNearestCharger().Agent.X - this.X) || BatteryLevel == (FindNearestCharger().Agent.Y - this.Y))
@@ -102,9 +115,11 @@ namespace ColetorLixo.Models
             //retorna o carregador mais proximo do coletor na lista de carregadores do coletor
             return Chargers.FirstOrDefault();
         }
+
         #endregion
 
         #region Trash Methods
+
         private void GoEmpty()
         {
             //Movimenta ate a lixeira
@@ -122,6 +137,9 @@ namespace ColetorLixo.Models
         {
             return FullLoad;
         }
+
+        #endregion
+
         #endregion
 
     }
