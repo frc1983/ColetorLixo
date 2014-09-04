@@ -19,7 +19,7 @@ namespace ColetorLixo.Models
         public List<Cell> NeighborsCells { get; set; }
         public List<Cell> VisitedCells { get; set; }
         public Cell ActualCell { get; set; }
-        
+
         #endregion
 
         #region Constructor
@@ -43,7 +43,7 @@ namespace ColetorLixo.Models
         {
             //Se o coletor procurar por lixo (LookGarbages) nas posicoes ao seu redor e nao achar, move pra frente ate acabar e ter q descer
             //Se o coletor procurar por lixo (LookGarbages) e encontrar, move para a posicao do Agente lixo na celula encontrada
-            
+
             //Se o agente na celula para onde o coletor for movido for tipo garbage, chama addGarbageLoad e passa o agente da posicao
 
             //Depois de recolher o lixo, pode voltar para posicao anterior ou so seguir indo pro lado no X
@@ -80,15 +80,16 @@ namespace ColetorLixo.Models
         {
             return Math.Sqrt(Math.Pow((posInit.X - posFim.X), 2) + Math.Pow((posInit.Y - posFim.Y), 2));
         }
-        //TODO: terminar função que verifica os valores de cada vizinhos do vizinho - Nathan Abreu
-        public Cell MoveToObjectiveWithAStarAlg(Cell objective,List<Cell> neighbors,List<Cell> visited, Cell actual)
+
+        //TODO: testar função - Nathan Abreu
+        public Cell MoveToObjectiveWithAStarAlg(Cell objective, List<Cell> neighbors, List<Cell> visited, Cell actual, MatrixViewModel matrix)
         {
             //Exclue dos vizinhos as células já visitadas
             neighbors = neighbors.Except(visited).ToList();
             //se a lista de vizinhos ficar vazia quer dizer que não existe caminho válido então retorna a célula atual
             if (neighbors.Count == 0) return actual;
 
-            double menor =1000;
+            double menor = 1000;
             Cell result = actual;
             foreach (Cell c in neighbors)
             {
@@ -99,23 +100,69 @@ namespace ColetorLixo.Models
                 else
                 {
                     double value = CalcValueDistance(actual, c);
-                    if (value < menor)
+                    List<Cell> Nvisitados;
+                    visited.CopyTo(Nvisitados);
+                    visited.Add(actual);
+                    List<Cell> Nneighbors = getNeighbors(c, matrix, invalidos, nVisitados);
+                    double value2 = 1000;
+                    Cell n2 = null;
+                    foreach (Cell n in Nneighbors)
                     {
-                        menor = value;
+                        if (n == objective)
+                        {
+                            return n;
+                        }
+                        else
+                        {
+                            double temp = CalcValueDistance(c, objective);
+                            if (value2 > temp)
+                            {
+                                value2 = temp;
+                                n2 = n;
+                            }
+                        }
+
+                    }
+                    if (menor > value + value2)
+                    {
+                        menor = value + value2;
                         result = c;
                     }
+
+
                 }
             }
+
+
             return result;
         }
 
-        //TODO: método que retorne todos os vizinhos da celula considerando inválidos e limite da matriz - Nathan Abreu
-        //public List<Cell> getNeighbors(Cell celula)
-        //{
-        //    return List<Cell>;
-        //}
+        //método que retorna todos os vizinhos da celula não considerando inválidos e considerando limite da matriz - Nathan Abreu
+        public List<Cell> getNeighborsComLimitesMatriz(Cell celula, MatrixViewModel matrix)
+        {
+            List<Cell> neighbors;
 
-                       
+            if (celula.X - 1 >= 0 && celula.Y - 1 >= 0) neighbors.Add(new Cell(celula.X - 1, celula.Y - 1));
+            if (celula.X - 1 >= 0) neighbors.Add(new Cell(celula.X - 1, celula.Y));
+            if (celula.X - 1 >= matrix.Ambient.GetLength(0) && celula.Y + 1 >= matrix.Ambient.GetLength(1))
+                neighbors.Add(new Cell(celula.X - 1, celula.Y + 1));
+
+            if (celula.Y - 1 >= 0) neighbors.Add(new Cell(celula.X, celula.Y - 1));
+            if (celula.Y + 1 >= matrix.Ambient.GetLength(0)) neighbors.Add(new Cell(celula.X, celula.Y + 1));
+
+            if (celula.X + 1 >= matrix.Ambient.GetLength(0) && celula.Y - 1 >= 0) neighbors.Add(new Cell(celula.X + 1, celula.Y - 1));
+            if (celula.X + 1 >= matrix.Ambient.GetLength(0) && celula.Y >= 0) neighbors.Add(new Cell(celula.X + 1, celula.Y));
+            if (celula.X + 1 >= matrix.Ambient.GetLength(0) && celula.Y + 1 >= matrix.Ambient.GetLength(1)) neighbors.Add(new Cell(celula.X + 1, celula.Y + 1));
+
+            return neighbors;
+        }
+        //método que retorna todos os vizinhos da celula considerando inválidos, visitados e limite da matriz - Nathan Abreu
+        public List<Cell> getNeighbors(Cell celula, MatrixViewModel matrix, List<Cell> invalidos, List<Cell> visitados)
+        {
+            return getNeighborsComLimitesMatriz(celula, matrix).Except(invalidos).ToList().Except(visitados).ToList();
+        }
+
+
 
         #region Garbage Methods
 
