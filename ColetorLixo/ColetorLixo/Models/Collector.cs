@@ -15,7 +15,11 @@ namespace ColetorLixo.Models
         public List<Garbage> GarbageInside { get; set; }
         public List<Charger> Chargers { get; set; }
         public List<Trash> Trashes { get; set; }
-
+        public List<Cell> InvalidCells { get; set; }
+        public List<Cell> NeighborsCells { get; set; }
+        public List<Cell> VisitedCells { get; set; }
+        public Cell ActualCell { get; set; }
+        
         #endregion
 
         #region Constructor
@@ -71,6 +75,47 @@ namespace ColetorLixo.Models
 
             ((Collector)matrixVM.Ambient[colCell.X, colCell.Y].Agent).BatteryLevel--;
         }
+
+        public double CalcValueDistance(Cell posInit, Cell posFim)
+        {
+            return Math.Sqrt(Math.Pow((posInit.X - posFim.X), 2) + Math.Pow((posInit.Y - posFim.Y), 2));
+        }
+        //TODO: terminar função que verifica os valores de cada vizinhos do vizinho - Nathan Abreu
+        public Cell MoveToObjectiveWithAStarAlg(Cell objective,List<Cell> neighbors,List<Cell> visited, Cell actual)
+        {
+            //Exclue dos vizinhos as células já visitadas
+            neighbors = neighbors.Except(visited).ToList();
+            //se a lista de vizinhos ficar vazia quer dizer que não existe caminho válido então retorna a célula atual
+            if (neighbors.Count == 0) return actual;
+
+            double menor =1000;
+            Cell result = actual;
+            foreach (Cell c in neighbors)
+            {
+                if (c == objective)
+                {
+                    return c;
+                }
+                else
+                {
+                    double value = CalcValueDistance(actual, c);
+                    if (value < menor)
+                    {
+                        menor = value;
+                        result = c;
+                    }
+                }
+            }
+            return result;
+        }
+
+        //TODO: método que retorne todos os vizinhos da celula considerando inválidos e limite da matriz - Nathan Abreu
+        //public List<Cell> getNeighbors(Cell celula)
+        //{
+        //    return List<Cell>;
+        //}
+
+                       
 
         #region Garbage Methods
 
