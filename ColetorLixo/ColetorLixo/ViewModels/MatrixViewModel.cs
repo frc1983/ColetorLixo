@@ -15,6 +15,7 @@ namespace ColetorLixo.ViewModels
 
         public Cell[,] Ambient;
         public StringBuilder Html { get; set; }
+        public StringBuilder Status { get; set; }
 
         #endregion
 
@@ -36,6 +37,23 @@ namespace ColetorLixo.ViewModels
         internal void AddCollector(int x, int y)
         {
             AddAgent(new Collector(x, y, 10, 10));
+            foreach (Cell colector in GetCollectors())
+            {
+                foreach (Cell cell in GetAllAgents())
+                {
+                    Agent agent = cell.Agent;
+                    if (agent.AgentType.Equals(EnumAgentType.TRASH))
+                    {
+                        ((Collector)colector.Agent).Trashes.Add((Trash)agent);
+                        ((Collector)colector.Agent).InvalidCells.Add(new Cell(agent.X, agent.Y));
+                    }
+                    if (agent.AgentType.Equals(EnumAgentType.CHARGER))
+                    {
+                        ((Collector)colector.Agent).Chargers.Add((Charger)agent);
+                        ((Collector)colector.Agent).InvalidCells.Add(new Cell(agent.X, agent.Y));
+                    }
+                }
+            }
         }
 
         internal void AddGarbage(int x, int y, EnumGarbageType garbageType)
@@ -76,6 +94,20 @@ namespace ColetorLixo.ViewModels
                 for (int j = 0; j < Ambient.GetLength(1); j++)
                 {
                     if (Ambient[i, j].Agent != null && Ambient[i, j].Agent.AgentType.Equals(EnumAgentType.COLLECTOR))
+                        list.Add(Ambient[i, j]);
+                }
+
+            return list;
+        }
+
+        internal List<Cell> GetAllAgents()
+        {
+            List<Cell> list = new List<Cell>();
+
+            for (int i = 0; i < Ambient.GetLength(0); i++)
+                for (int j = 0; j < Ambient.GetLength(1); j++)
+                {
+                    if (Ambient[i, j].Agent != null && !Ambient[i, j].Agent.AgentType.Equals(EnumAgentType.GARBAGE))
                         list.Add(Ambient[i, j]);
                 }
 

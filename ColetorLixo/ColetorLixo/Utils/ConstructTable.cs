@@ -33,13 +33,13 @@ namespace ColetorLixo.Utils
 
         private static void BuildBody(MatrixViewModel matrixVM)
         {
-            for (int i = 0; i < matrixVM.Ambient.GetLength(0); i++)
+            for (int i = 0; i < matrixVM.Ambient.GetLength(1); i++)
             {
                 matrixVM.Html.Append("<tr><td> " + (i + 1) + "</td>");
 
-                for (int j = 0; j < matrixVM.Ambient.GetLength(1); j++)
+                for (int j = 0; j < matrixVM.Ambient.GetLength(0); j++)
                 {
-                    Cell local = matrixVM.Ambient[i, j];
+                    Cell local = matrixVM.Ambient[j, i];
                     if(local.Agent != null && !string.IsNullOrEmpty(local.Agent.ImagePath))
                         matrixVM.Html.Append("<td><img src= '" + local.Agent.ImagePath + "' alt='Image' /></td>");
                     else

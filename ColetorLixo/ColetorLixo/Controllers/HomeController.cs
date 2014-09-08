@@ -16,13 +16,11 @@ namespace ColetorLixo.Controllers
 
         public ActionResult Index()
         {
-            matrixVM = new MatrixViewModel(15, 15);//TODO: Parametrizar tamanhos
+            matrixVM = new MatrixViewModel(15, 15);//TODO: Parametrizar tamanhos ( X, Y )
             matrixVM.Html = new StringBuilder();
 
             TempData["matrixVM"] = matrixVM;
             TempData.Keep("matrixVM");
-
-            matrixVM.AddCollector(0, 0);
 
             matrixVM.AddTrash(RandomPositions.GetNextX(matrixVM.Ambient), RandomPositions.GetNextY(matrixVM.Ambient), EnumGarbageType.Metal);
             matrixVM.AddTrash(RandomPositions.GetNextX(matrixVM.Ambient), RandomPositions.GetNextY(matrixVM.Ambient), EnumGarbageType.Paper);
@@ -33,6 +31,9 @@ namespace ColetorLixo.Controllers
             matrixVM.AddGarbage(RandomPositions.GetNextX(matrixVM.Ambient), RandomPositions.GetNextY(matrixVM.Ambient), EnumGarbageType.Plastic);
             matrixVM.AddGarbage(RandomPositions.GetNextX(matrixVM.Ambient), RandomPositions.GetNextY(matrixVM.Ambient), EnumGarbageType.Paper);
             matrixVM.AddGarbage(RandomPositions.GetNextX(matrixVM.Ambient), RandomPositions.GetNextY(matrixVM.Ambient), EnumGarbageType.Metal);
+
+            //Importante deixar por ultimo para existirem todas lixeiras e carregadores
+            matrixVM.AddCollector(0, 0);
 
             return View();
         }
@@ -55,8 +56,9 @@ namespace ColetorLixo.Controllers
                 GetMatrix();
 
             ConstructTable.BuildTable(matrixVM);
+            ConstructStatus.BuildStatus(matrixVM);
 
-            var result = new { Html = matrixVM.Html.ToString() };
+            var result = new { Html = matrixVM.Html.ToString(), Status = matrixVM.Status.ToString() };
             return new JsonResult() { Data = result, JsonRequestBehavior = JsonRequestBehavior.AllowGet };
         }
 
