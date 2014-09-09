@@ -82,7 +82,7 @@ namespace ColetorLixo.Models
         }
 
         //TODO: testar função - Nathan Abreu
-        public Cell MoveToObjectiveWithAStarAlg(Cell objective, List<Cell> neighbors, List<Cell> visited, Cell actual, MatrixViewModel matrix)
+        public Cell MoveToObjectiveWithAStarAlg(Cell objective,List<Cell> invalid, List<Cell> neighbors, List<Cell> visited, Cell actual, MatrixViewModel matrix)
         {
             //Exclue dos vizinhos as células já visitadas
             neighbors = neighbors.Except(visited).ToList();
@@ -100,10 +100,10 @@ namespace ColetorLixo.Models
                 else
                 {
                     double value = CalcValueDistance(actual, c);
-                    List<Cell> Nvisitados;
-                    visited.CopyTo(Nvisitados);
-                    visited.Add(actual);
-                    List<Cell> Nneighbors = getNeighbors(c, matrix, invalidos, nVisitados);
+                    List<Cell> Nvisitados = null;
+                    Nvisitados = visited;
+                    Nvisitados.Add(actual);
+                    List<Cell> Nneighbors = getNeighbors(c, matrix, invalid, Nvisitados);
                     double value2 = 1000;
                     Cell n2 = null;
                     foreach (Cell n in Nneighbors)
@@ -140,7 +140,7 @@ namespace ColetorLixo.Models
         //método que retorna todos os vizinhos da celula não considerando inválidos e considerando limite da matriz - Nathan Abreu
         public List<Cell> getNeighborsComLimitesMatriz(Cell celula, MatrixViewModel matrix)
         {
-            List<Cell> neighbors;
+            List<Cell> neighbors = null;
 
             if (celula.X - 1 >= 0 && celula.Y - 1 >= 0) neighbors.Add(new Cell(celula.X - 1, celula.Y - 1));
             if (celula.X - 1 >= 0) neighbors.Add(new Cell(celula.X - 1, celula.Y));
@@ -156,6 +156,55 @@ namespace ColetorLixo.Models
 
             return neighbors;
         }
+
+        //método que retorna todos os vizinhos da celula não considerando inválidos e considerando limite da matriz - Nathan Abreu
+        public int getValorNeighborsComSentido(Cell celula,Cell celulaN, MatrixViewModel matrix, List<Cell> ocupadas)
+        {
+            
+            if((celulaN.X == celula.X-1) && (celulaN.Y == celula.Y-1)){
+                if((celula.X-2<0) && (celula.Y-2<0)){ return 0;}
+                else if(ocupadas.Contains(new Cell(celulaN.X-2,celula.Y-2))){return 1;}    
+                else return -1;
+            }
+            if ((celulaN.X == celula.X-1) && (celulaN.Y == celula.Y)) {
+            if (celula.X - 2 < 0) { return 0; }
+            else if (ocupadas.Contains(new Cell(celulaN.X-2, celula.Y))) { return 1; }
+            else return -1;
+            }
+
+            if ((celulaN.X == celula.X - 1) && (celulaN.Y == celula.Y + 1)){
+            if ((celula.X - 2 < 0) && (celula.Y + 2 < matrix.Ambient.GetLength(1))) { return 0; }
+            else if (ocupadas.Contains(new Cell(celulaN.X - 2, celula.Y + 2))) { return 1; }
+            else return -1;
+            }
+            if ((celulaN.X == celula.X) && (celulaN.Y == celula.Y + 1)) {
+            if((celula.Y + 2 < matrix.Ambient.GetLength(0))){ return 0;}
+                else if(ocupadas.Contains(new Cell(celulaN.X, celula.Y + 2))){return 1;}    
+                else return -1;
+            }
+            if ((celulaN.X == celula.X + 1) && (celulaN.Y == celula.Y + 1)) {
+            if((celula.X + 2 < matrix.Ambient.GetLength(0)) && (celula.Y + 2 < matrix.Ambient.GetLength(1))){ return 0;}
+                else if(ocupadas.Contains(new Cell(celulaN.X + 2, celula.Y + 2))){return 1;}    
+                else return -1;
+            }
+            if ((celulaN.X == celula.X + 2) && (celulaN.Y == celula.Y)) {
+            if((celula.X + 2 < matrix.Ambient.GetLength(1))){ return 0;}
+                else if(ocupadas.Contains(new Cell(celulaN.X + 2, celula.Y))){return 1;}    
+                else return -1;
+            }
+            if ((celulaN.X == celula.X + 1) && (celulaN.Y == celula.Y - 1)){
+                if ((celula.X + 2 < 0) && (celula.Y - 2 < matrix.Ambient.GetLength(1))) { return 0; }
+                else if(ocupadas.Contains(new Cell(celulaN.X - 2, celula.Y - 2))){return 1;}    
+                else return -1;
+            }
+            if ((celulaN.X == celula.X) && (celulaN.Y == celula.Y - 2)) {
+                if (celula.Y - 2 < 0) { return 0; }
+                else if(ocupadas.Contains(new Cell(celulaN.X, celula.Y - 2))){return 1;}    
+                else return -1;
+            }
+            return 1;
+        }
+
         //método que retorna todos os vizinhos da celula considerando inválidos, visitados e limite da matriz - Nathan Abreu
         public List<Cell> getNeighbors(Cell celula, MatrixViewModel matrix, List<Cell> invalidos, List<Cell> visitados)
         {
