@@ -12,6 +12,8 @@
     <input id="start" type="button" value="start" class="button left" />
     <input id="pause" type="button" value="pause" class="button left" />
     <input id="stop" type="button" value="stop" class="button" />
+
+    <div id="status"></div>
 </div>
 
 <div class="matrix left">
@@ -54,6 +56,7 @@
             url: '@Url.Action("PopulateMatrix")',
             success: function (data) {
                 $("#container").html(data.Html);
+                $("#status").html(data.Status);
 
                 if (data.Complete === "True")
                     $("#pause").trigger("click");
@@ -71,6 +74,7 @@
             url: '@Url.Action("DrawTable")',
             success: function (data) {
                 $("#container").html(data.Html);
+                $("#status").html(data.Status);
             },
             error: function () {
                 alert("Nenhum dado recebido.");
