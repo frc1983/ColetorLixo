@@ -189,25 +189,30 @@ namespace ColetorLixo.Models
         {
             NeighborsCells = new List<Cell>();
             List<Cell> neighbors = null;
-
+            //Add (i-1,j-1)
             if (celula.X - 1 >= 0 && celula.Y - 1 >= 0) 
                 NeighborsCells.Add(new Cell(celula.X - 1, celula.Y - 1));
+            //Add (i-1,j)
             if (celula.X - 1 >= 0)
                 NeighborsCells.Add(new Cell(celula.X - 1, celula.Y));
-            if (celula.X - 1 >= matrix.Ambient.GetLength(0) && celula.Y + 1 >= matrix.Ambient.GetLength(1))
+            //Add (i-1,j+1)
+            if (celula.X - 1 >= 0 && celula.Y + 1 >= matrix.Ambient.GetLength(1))
                 NeighborsCells.Add(new Cell(celula.X - 1, celula.Y + 1));
-
-            if (celula.Y - 1 >= 0)
-                NeighborsCells.Add(new Cell(celula.X, celula.Y - 1));
-            if (celula.Y + 1 >= matrix.Ambient.GetLength(0))
+            //Add (i,j+1)
+            if (celula.Y + 1 >= matrix.Ambient.GetLength(1))
                 NeighborsCells.Add(new Cell(celula.X, celula.Y + 1));
-
-            if (celula.X + 1 >= matrix.Ambient.GetLength(0) && celula.Y - 1 >= 0)
-                NeighborsCells.Add(new Cell(celula.X + 1, celula.Y - 1));
-            if (celula.X + 1 >= matrix.Ambient.GetLength(0) && celula.Y >= 0)
-                NeighborsCells.Add(new Cell(celula.X + 1, celula.Y));
+            //Add (i+1,j+1)
             if (celula.X + 1 >= matrix.Ambient.GetLength(0) && celula.Y + 1 >= matrix.Ambient.GetLength(1))
-                NeighborsCells.Add(new Cell(celula.X + 1, celula.Y + 1));
+                NeighborsCells.Add(new Cell(celula.X+1, celula.Y + 1));
+            //Add (i+1,j)
+            if (celula.X + 1 >= matrix.Ambient.GetLength(0))
+                NeighborsCells.Add(new Cell(celula.X, celula.Y + 1));
+            //Add (i+1,j-1)
+            if (celula.X + 1 >= matrix.Ambient.GetLength(0) && celula.Y-1 >= 0)
+                NeighborsCells.Add(new Cell(celula.X + 1, celula.Y-1));
+            //Add (i,j-1)
+            if (celula.Y - 1 >= 0)
+                NeighborsCells.Add(new Cell(celula.X , celula.Y - 1));
 
             return NeighborsCells;
         }
