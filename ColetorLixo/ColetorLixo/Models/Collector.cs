@@ -134,15 +134,16 @@ namespace ColetorLixo.Models
         }
 
         //TODO: testar função - Nathan Abreu
-        public Cell MoveToObjectiveWithAStarAlg(Cell objective,List<Cell> invalid, List<Cell> neighbors, List<Cell> visited, Cell actual, MatrixViewModel matrix)
+        public Cell MoveToObjectiveWithAStarAlg(Cell objective,List<Cell> invalid, List<Cell> visited, Cell actual, MatrixViewModel matrix)
         {
+            List<Cell> neighbors = GetNeighbors(actual, matrix, invalid, visited);
             //Exclue dos vizinhos as células já visitadas
             neighbors = neighbors.Except(visited).ToList();
             //se a lista de vizinhos ficar vazia quer dizer que não existe caminho válido então retorna a célula atual
             if (neighbors.Count == 0) 
                 return actual;
 
-            double menor = 1000;
+            double menor = 0;
             Cell result = actual;
             foreach (Cell neighbor in neighbors)
             {
@@ -150,32 +151,31 @@ namespace ColetorLixo.Models
                     return neighbor;
                 else
                 {
-                    double value = CalcValueDistance(actual, c);
+                    double value1 = CalcValueDistance(neighbor, objective);
                     List<Cell> Nvisitados = null;
                     Nvisitados = visited;
                     Nvisitados.Add(actual);
-                    List<Cell> Nneighbors = getNeighbors(c, matrix, invalid, Nvisitados);
+                    List<Cell> Nneighbors = getNeighbors(neighbor, matrix, invalid, Nvisitados);
                     double value2 = 1000;
-                    Cell n2 = null;
                     foreach (Cell n in Nneighbors)
                     {
                         if (n == objective)
                         {
-                            return n;
+                            return neighbor;
                         }
                         else
                         {
-                            double temp = CalculateDistance(neighbor, objective);
+                            double temp = CalculateDistance(n, objective);
                             if (value2 > temp)
                             {
                                 value2 = temp;
-                                n2 = n;
                             }
                         }
                     }
-                    if (menor > value + value2)
+
+                    if (menor > value1 + value2)
                     {
-                        menor = value + value2;
+                        menor = value1 + value2;
                         result = neighbor;
                     }
                 }
@@ -215,6 +215,12 @@ namespace ColetorLixo.Models
                 NeighborsCells.Add(new Cell(celula.X , celula.Y - 1));
 
             return NeighborsCells;
+        }
+
+        //método que retorna todos os vizinhos da celula considerando inválidos, visitados e limite da matriz - Nathan Abreu
+        public List<Cell> GetNeighbors(Cell celula, MatrixViewModel matrix, List<Cell> invalidos, List<Cell> visitados)
+        {
+            return GetNeighborsComLimitesMatriz(celula, matrix).Except(invalidos).Except(visitados).ToList();
         }
 
         //método que retorna todos os vizinhos da celula não considerando inválidos e considerando limite da matriz - Nathan Abreu
@@ -263,12 +269,6 @@ namespace ColetorLixo.Models
                 else return -1;
             }
             return 1;
-        }
-
-        //método que retorna todos os vizinhos da celula considerando inválidos, visitados e limite da matriz - Nathan Abreu
-        public List<Cell> GetNeighbors(Cell celula, MatrixViewModel matrix, List<Cell> invalidos, List<Cell> visitados)
-        {
-            return GetNeighborsComLimitesMatriz(celula, matrix).Except(invalidos).Except(visitados).ToList();
         }
 
         #region Garbage Methods
