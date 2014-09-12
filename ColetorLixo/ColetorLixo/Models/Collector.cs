@@ -69,52 +69,22 @@ namespace ColetorLixo.Models
             {
                 //Se o coletor procurar por lixo (LookGarbages) e encontrar, 
                 //move para a posicao do Agente lixo na celula encontrada
-                //MoveToObjectiveWithAStarAlg(new Cell(garbages.First().X, garbages.First().Y), NeighborsCells, VisitedCells, colCell, matrixVM);
                 //Se o agente na celula para onde o coletor for movido for tipo garbage, 
                 //chama addGarbageLoad e passa o agente da posicao
 
+                //Guarda o agente
+                Agent tmp = colCell.Agent;
+                //Tira o agente da celula antiga
+                matrixVM.Ambient[colCell.X, colCell.Y].Agent = null;
+                //Busca a nova posicao mais prxima do objetivo
+                Cell newCell = MoveToObjectiveWithAStarAlg(colCell, new Cell(garbages.First().X, garbages.First().Y), matrixVM);
+                //Coloca o agente na celula nova
+                matrixVM.Ambient[newCell.X, newCell.Y].Agent = tmp;                
             }
-
-            DefaultMovement(matrixVM, colCell);            
-        }
-
-        private void DefaultMovement(MatrixViewModel matrixVM, Cell colCell)
-        {
-            if (!MoveLeft)
+            else
             {
-                if (colCell.X + 1 < matrixVM.Ambient.GetLength(0) &&
-                (matrixVM.Ambient[colCell.X + 1, colCell.Y].Agent == null ||
-                matrixVM.Ambient[colCell.X + 1, colCell.Y].Agent.AgentType.Equals(EnumAgentType.GARBAGE)))
-                {
-                    Movement.MoveToRight(matrixVM, colCell);
-                }
-                else if (colCell.X + 1 == matrixVM.Ambient.GetLength(0) &&
-                (matrixVM.Ambient[colCell.X, colCell.Y + 1].Agent == null ||
-                    matrixVM.Ambient[colCell.X, colCell.Y + 1].Agent.AgentType.Equals(EnumAgentType.GARBAGE)))
-                {
-                    Movement.MoveToDown(matrixVM, colCell);
-                    MoveLeft = true;
-                }
+                Movement.DefaultMovement(matrixVM, colCell);
             }
-            else if (MoveLeft)
-            {
-                if (colCell.X - 1 >= 0 &&
-                (matrixVM.Ambient[colCell.X - 1, colCell.Y].Agent == null ||
-                matrixVM.Ambient[colCell.X - 1, colCell.Y].Agent.AgentType.Equals(EnumAgentType.GARBAGE)))
-                {
-                    Movement.MoveToLeft(matrixVM, colCell);
-                }
-                else if (colCell.X - 1 < 0 &&
-                    (matrixVM.Ambient[colCell.X, colCell.Y + 1].Agent == null ||
-                    matrixVM.Ambient[colCell.X, colCell.Y + 1].Agent.AgentType.Equals(EnumAgentType.GARBAGE)))
-                {
-                    Movement.MoveToDown(matrixVM, colCell);
-                    MoveLeft = false;
-                }
-            }
-
-            ((Collector)matrixVM.Ambient[colCell.X, colCell.Y].Agent).VisitedCells.Add(colCell);
-            ((Collector)matrixVM.Ambient[colCell.X, colCell.Y].Agent).BatteryLevel--;
         }
 
         public double CalculateDistance(Cell posInit, Cell posFim)
@@ -123,30 +93,30 @@ namespace ColetorLixo.Models
         }
 
         //TODO: testar função - Nathan Abreu
-        public Cell MoveToObjectiveWithAStarAlg(Cell objective,List<Cell> invalid, List<Cell> visited, Cell actual, MatrixViewModel matrix)
+        public Cell MoveToObjectiveWithAStarAlg(Cell actual, Cell objective, MatrixViewModel matrix)
         {
-            List<Cell> neighbors = GetNeighbors(actual, matrix, invalid, visited);
+            List<Cell> neighbors = GetNeighbors(actual, matrix, this.InvalidCells, this.VisitedCells);
             //Exclue dos vizinhos as células já visitadas
-            neighbors = neighbors.Except(visited).ToList();
+            //neighbors = neighbors.Except(visited).ToList();//FABIO - GetNeighbors ja exclui visitados
+
             //se a lista de vizinhos ficar vazia quer dizer que não existe caminho válido então retorna a célula atual
             if (neighbors.Count == 0) 
                 return actual;
 
             double menor = 0;
-            Cell result = actual;
+
             foreach (Cell neighbor in neighbors)
             {
                 if (neighbor == objective)
                     return neighbor;
                 else
                 {
-                    double value1 = CalculateDistance(neighbor, objective);
-                    List<Cell> Nvisitados = null;
-                    Nvisitados = visited;
-                    Nvisitados.Add(actual);
-                    List<Cell> Nneighbors = GetNeighbors(neighbor, matrix, invalid, Nvisitados);
+                    double distance = CalculateDistance(neighbor, objective);
+
+                    List<Cell> localNeighbors = GetNeighbors(neighbor, matrix, this.InvalidCells, this.VisitedCells);
+
                     double value2 = 1000;
-                    foreach (Cell n in Nneighbors)
+                    foreach (Cell n in localNeighbors)
                     {
                         if (n == objective)
                         {
@@ -162,15 +132,15 @@ namespace ColetorLixo.Models
                         }
                     }
 
-                    if (menor > value1 + value2)
+                    if (menor > distance + value2)
                     {
-                        menor = value1 + value2;
-                        result = neighbor;
+                        menor = distance + value2;
+                        actual = neighbor;
                     }
                 }
             }
 
-            return result;
+            return actual;
         }
         
         //método que retorna todos os vizinhos da celula considerando inválidos, visitados e limite da matriz - Nathan Abreu
@@ -204,54 +174,6 @@ namespace ColetorLixo.Models
 
             //return GetNeighborsComLimitesMatriz(celula, matrix).Except(invalidos).Except(visitados).ToList();
             return NeighborsCells;
-        }
-
-        //método que retorna todos os vizinhos da celula não considerando inválidos e considerando limite da matriz - Nathan Abreu
-        public int getValorNeighborsComSentido(Cell celula,Cell celulaN, MatrixViewModel matrix, List<Cell> ocupadas)
-        {
-            
-            if((celulaN.X == celula.X-1) && (celulaN.Y == celula.Y-1)){
-                if((celula.X-2<0) && (celula.Y-2<0)){ return 0;}
-                else if(ocupadas.Contains(new Cell(celulaN.X-2,celula.Y-2))){return 1;}    
-                else return -1;
-            }
-            if ((celulaN.X == celula.X-1) && (celulaN.Y == celula.Y)) {
-            if (celula.X - 2 < 0) { return 0; }
-            else if (ocupadas.Contains(new Cell(celulaN.X-2, celula.Y))) { return 1; }
-            else return -1;
-            }
-
-            if ((celulaN.X == celula.X - 1) && (celulaN.Y == celula.Y + 1)){
-            if ((celula.X - 2 < 0) && (celula.Y + 2 < matrix.Ambient.GetLength(1))) { return 0; }
-            else if (ocupadas.Contains(new Cell(celulaN.X - 2, celula.Y + 2))) { return 1; }
-            else return -1;
-            }
-            if ((celulaN.X == celula.X) && (celulaN.Y == celula.Y + 1)) {
-            if((celula.Y + 2 < matrix.Ambient.GetLength(0))){ return 0;}
-                else if(ocupadas.Contains(new Cell(celulaN.X, celula.Y + 2))){return 1;}    
-                else return -1;
-            }
-            if ((celulaN.X == celula.X + 1) && (celulaN.Y == celula.Y + 1)) {
-            if((celula.X + 2 < matrix.Ambient.GetLength(0)) && (celula.Y + 2 < matrix.Ambient.GetLength(1))){ return 0;}
-                else if(ocupadas.Contains(new Cell(celulaN.X + 2, celula.Y + 2))){return 1;}    
-                else return -1;
-            }
-            if ((celulaN.X == celula.X + 2) && (celulaN.Y == celula.Y)) {
-            if((celula.X + 2 < matrix.Ambient.GetLength(1))){ return 0;}
-                else if(ocupadas.Contains(new Cell(celulaN.X + 2, celula.Y))){return 1;}    
-                else return -1;
-            }
-            if ((celulaN.X == celula.X + 1) && (celulaN.Y == celula.Y - 1)){
-                if ((celula.X + 2 < 0) && (celula.Y - 2 < matrix.Ambient.GetLength(1))) { return 0; }
-                else if(ocupadas.Contains(new Cell(celulaN.X - 2, celula.Y - 2))){return 1;}    
-                else return -1;
-            }
-            if ((celulaN.X == celula.X) && (celulaN.Y == celula.Y - 2)) {
-                if (celula.Y - 2 < 0) { return 0; }
-                else if(ocupadas.Contains(new Cell(celulaN.X, celula.Y - 2))){return 1;}    
-                else return -1;
-            }
-            return 1;
         }
 
         #region Garbage Methods
