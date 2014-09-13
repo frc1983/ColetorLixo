@@ -22,6 +22,7 @@ namespace ColetorLixo.Utils
 
                 if (agent.AgentType == EnumAgentType.COLLECTOR)
                 {
+                    matrixVM.Status.Append("Bateria: " + ((Collector)agent).BatteryLevel + "<br />");
                     matrixVM.Status.Append("Lixos dentro:<br />");
                     foreach (Garbage garbage in ((Collector)agent).GarbageInside.OrderBy(x => x.GarbageType))
                         matrixVM.Status.Append("    Tipo: " + garbage.GarbageType + "<br />");

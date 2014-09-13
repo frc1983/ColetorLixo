@@ -36,7 +36,7 @@ namespace ColetorLixo.ViewModels
 
         internal void AddCollector(int x, int y)
         {
-            AddAgent(new Collector(x, y, 10, 3));
+            AddAgent(new Collector(x, y, 10, 10));
             foreach (Cell colector in GetCollectors())
             {
                 foreach (Cell cell in GetAllAgents())
