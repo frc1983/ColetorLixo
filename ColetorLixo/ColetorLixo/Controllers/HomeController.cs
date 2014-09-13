@@ -27,13 +27,13 @@ namespace ColetorLixo.Controllers
             matrixVM.AddTrash(RandomPositions.GetNextX(matrixVM.Ambient), RandomPositions.GetNextY(matrixVM.Ambient), EnumGarbageType.Plastic);
             matrixVM.AddTrash(RandomPositions.GetNextX(matrixVM.Ambient), RandomPositions.GetNextY(matrixVM.Ambient), EnumGarbageType.Glass);
             matrixVM.AddCharger(RandomPositions.GetNextX(matrixVM.Ambient), RandomPositions.GetNextY(matrixVM.Ambient));
-            matrixVM.AddGarbage(RandomPositions.GetNextX(matrixVM.Ambient), RandomPositions.GetNextY(matrixVM.Ambient), EnumGarbageType.Glass);
-            matrixVM.AddGarbage(RandomPositions.GetNextX(matrixVM.Ambient), RandomPositions.GetNextY(matrixVM.Ambient), EnumGarbageType.Plastic);
-            matrixVM.AddGarbage(RandomPositions.GetNextX(matrixVM.Ambient), RandomPositions.GetNextY(matrixVM.Ambient), EnumGarbageType.Paper);
+            matrixVM.AddGarbage(0, 0, EnumGarbageType.Glass);
+            matrixVM.AddGarbage(0, 2, EnumGarbageType.Plastic);
+            matrixVM.AddGarbage(2, 0, EnumGarbageType.Paper);
             matrixVM.AddGarbage(RandomPositions.GetNextX(matrixVM.Ambient), RandomPositions.GetNextY(matrixVM.Ambient), EnumGarbageType.Metal);
 
             //Importante deixar por ultimo para existirem todas lixeiras e carregadores
-            matrixVM.AddCollector(0, 0);
+            matrixVM.AddCollector(1, 1);
 
             return View();
         }

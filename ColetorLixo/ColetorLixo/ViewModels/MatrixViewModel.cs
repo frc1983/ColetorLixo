@@ -36,12 +36,12 @@ namespace ColetorLixo.ViewModels
 
         internal void AddCollector(int x, int y)
         {
-            AddAgent(new Collector(x, y, 10, 10));
+            AddAgent(new Collector(x, y, 10, 3));
             foreach (Cell colector in GetCollectors())
             {
                 foreach (Cell cell in GetAllAgents())
                 {
-                    Agent agent = cell.Agent;
+                    Agent agent = (Agent)cell.Agent;
                     if (agent.AgentType.Equals(EnumAgentType.TRASH))
                     {
                         ((Collector)colector.Agent).Trashes.Add((Trash)agent);
@@ -93,7 +93,7 @@ namespace ColetorLixo.ViewModels
             for (int i = 0; i < Ambient.GetLength(0); i++)
                 for (int j = 0; j < Ambient.GetLength(1); j++)
                 {
-                    if (Ambient[i, j].Agent != null && Ambient[i, j].Agent.AgentType.Equals(EnumAgentType.COLLECTOR))
+                    if (Ambient[i, j].Agent != null && (((Agent)Ambient[i, j].Agent).AgentType.Equals(EnumAgentType.COLLECTOR)))
                         list.Add(Ambient[i, j]);
                 }
 
@@ -107,7 +107,7 @@ namespace ColetorLixo.ViewModels
             for (int i = 0; i < Ambient.GetLength(0); i++)
                 for (int j = 0; j < Ambient.GetLength(1); j++)
                 {
-                    if (Ambient[i, j].Agent != null && !Ambient[i, j].Agent.AgentType.Equals(EnumAgentType.GARBAGE))
+                    if (Ambient[i, j].Agent != null && !((Agent)Ambient[i, j].Agent).AgentType.Equals(EnumAgentType.GARBAGE))
                         list.Add(Ambient[i, j]);
                 }
 

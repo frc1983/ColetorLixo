@@ -16,7 +16,7 @@ namespace ColetorLixo.Utils
             matrixVM.Status.Append("<fieldset><legend>Status dos Agentes:</legend>");
             foreach (Cell cell in matrixVM.GetAllAgents())
             {
-                Agent agent = cell.Agent;
+                Agent agent = (Agent)cell.Agent;
                 matrixVM.Status.Append("Tipo: " + agent.AgentType + "<br />");
                 matrixVM.Status.Append("X: " + (cell.X + 1) + " Y: " + (cell.Y + 1) + "<br />");
 

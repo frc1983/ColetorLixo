@@ -55,6 +55,7 @@
             async: true,
             url: '@Url.Action("PopulateMatrix")',
             success: function (data) {
+                console.log(data)
                 $("#container").html(data.Html);
                 $("#status").html(data.Status);
 

@@ -47,13 +47,23 @@ namespace ColetorLixo.Models
 
         public void MoveCollector(MatrixViewModel matrixVM, Cell colCell)
         {
+            var garbages = LookGarbages(colCell, matrixVM);
             if (IsNeedCharge(colCell))
             {
                 Charger nearest = FindNearestCharger(colCell);
-                //TODO: GoCharge(nearest, 10);
-            }
 
-            if (IsFullGarbage())
+                //Guarda o agente atual
+                Agent tmp = (Agent)colCell.Agent;
+                //Tira o agente da celula antiga
+                matrixVM.Ambient[colCell.X, colCell.Y].Agent = null;
+                //Busca a nova posicao mais prxima do objetivo
+                Cell newCell = MoveToObjectiveWithAStarAlg(colCell, new Cell(nearest.X, nearest.Y), matrixVM);
+
+                //Coloca o agente na celula nova
+                matrixVM.Ambient[newCell.X, newCell.Y].Agent = tmp;
+                //GoCharge(nearest, 10);
+            }
+            else if (IsFullGarbage())
             {
                 foreach (Garbage garb in GarbageInside)
                 {
@@ -61,89 +71,81 @@ namespace ColetorLixo.Models
                     //TODO: GoEmpty(nearest);
                 }
             }
-
-            //Se o coletor procurar por lixo (LookGarbages) nas posicoes ao seu redor 
-            //e nao achar, move pra frente ate acabar e ter q descer
-            var garbages = LookGarbages(colCell, matrixVM);
-            if (garbages.Count() > 0)
+            else if (garbages.Count() > 0)
             {
-                //Se o coletor procurar por lixo (LookGarbages) e encontrar, 
-                //move para a posicao do Agente lixo na celula encontrada
-                //Se o agente na celula para onde o coletor for movido for tipo garbage, 
-                //chama addGarbageLoad e passa o agente da posicao
-
-                //Guarda o agente
-                Agent tmp = colCell.Agent;
+                //Guarda o agente atual
+                Agent tmp = (Agent)colCell.Agent;                
                 //Tira o agente da celula antiga
                 matrixVM.Ambient[colCell.X, colCell.Y].Agent = null;
                 //Busca a nova posicao mais prxima do objetivo
                 Cell newCell = MoveToObjectiveWithAStarAlg(colCell, new Cell(garbages.First().X, garbages.First().Y), matrixVM);
+
+                if (newCell.Agent!= null && ((Agent)newCell.Agent).AgentType.Equals(EnumAgentType.GARBAGE))
+                    AddGarbageLoad((Garbage)newCell.Agent, 1);
+
                 //Coloca o agente na celula nova
-                matrixVM.Ambient[newCell.X, newCell.Y].Agent = tmp;                
+                matrixVM.Ambient[newCell.X, newCell.Y].Agent = tmp;
             }
             else
-            {
                 Movement.DefaultMovement(matrixVM, colCell);
-            }
+
+            this.BatteryLevel--;
         }
 
-        public double CalculateDistance(Cell posInit, Cell posFim)
+        public int CalculateDistance(Cell posInit, Cell posFim)
         {
-            return Math.Sqrt(Math.Pow((posInit.X - posFim.X), 2) + Math.Pow((posInit.Y - posFim.Y), 2));
+            return Convert.ToInt32(Math.Sqrt(Math.Pow((posInit.X - posFim.X), 2) + Math.Pow((posInit.Y - posFim.Y), 2)));
         }
 
-        //TODO: testar função - Nathan Abreu
         public Cell MoveToObjectiveWithAStarAlg(Cell actual, Cell objective, MatrixViewModel matrix)
         {
             List<Cell> neighbors = GetNeighbors(actual, matrix, this.InvalidCells, this.VisitedCells);
-            //Exclue dos vizinhos as células já visitadas
-            //neighbors = neighbors.Except(visited).ToList();//FABIO - GetNeighbors ja exclui visitados
 
-            //se a lista de vizinhos ficar vazia quer dizer que não existe caminho válido então retorna a célula atual
             if (neighbors.Count == 0) 
                 return actual;
 
-            double menor = 0;
+            //Busca os passos possiveis do agente
+            List<Cell> possibleCell = GetPath(actual, neighbors);
 
-            foreach (Cell neighbor in neighbors)
+            if (objective == null)
+                objective = possibleCell.First();
+
+            int max = int.MaxValue;
+            foreach (Cell neighbor in possibleCell)
             {
                 if (neighbor == objective)
                     return neighbor;
                 else
                 {
-                    double distance = CalculateDistance(neighbor, objective);
+                    int distance = CalculateDistance(neighbor, objective);
 
-                    List<Cell> localNeighbors = GetNeighbors(neighbor, matrix, this.InvalidCells, this.VisitedCells);
-
-                    double value2 = 1000;
-                    foreach (Cell n in localNeighbors)
+                    if (max > distance)
                     {
-                        if (n == objective)
-                        {
-                            return neighbor;
-                        }
-                        else
-                        {
-                            double temp = CalculateDistance(n, objective);
-                            if (value2 > temp)
-                            {
-                                value2 = temp;
-                            }
-                        }
-                    }
-
-                    if (menor > distance + value2)
-                    {
-                        menor = distance + value2;
+                        max = distance;
                         actual = neighbor;
                     }
                 }
             }
-
+            
             return actual;
         }
+
+        private List<Cell> GetPath(Cell actual, List<Cell> neighbors)
+        {
+            return neighbors.Where(x =>
+                (x.Agent == null || ((Agent)x.Agent).AgentType.Equals(EnumAgentType.GARBAGE)) &&
+                (
+                    ((actual.X + 1).Equals(x.X) && actual.Y.Equals(x.Y)) ||
+                    (actual.X == x.X && (actual.Y + 1).Equals(x.Y)) ||
+                    (actual.X == x.X && (actual.Y - 1).Equals(x.Y)) ||
+                    ((actual.X - 1).Equals(x.X) && actual.Y.Equals(x.Y)) ||
+                    ((actual.X - 1).Equals(x.X) && (actual.Y + 1).Equals(x.Y)) ||
+                    ((actual.X - 1).Equals(x.X) && (actual.Y - 1).Equals(x.Y)) ||                    
+                    ((actual.X + 1).Equals(x.X) && (actual.Y + 1).Equals(x.Y)) ||
+                    ((actual.X + 1).Equals(x.X) && (actual.Y - 1).Equals(x.Y))
+                )).ToList();
+        }
         
-        //método que retorna todos os vizinhos da celula considerando inválidos, visitados e limite da matriz - Nathan Abreu
         public List<Cell> GetNeighbors(Cell celula, MatrixViewModel matrix, List<Cell> invalidos, List<Cell> visitados)
         {
             NeighborsCells = new List<Cell>();
@@ -172,7 +174,6 @@ namespace ColetorLixo.Models
                     NeighborsCells.Remove(i);
             }
 
-            //return GetNeighborsComLimitesMatriz(celula, matrix).Except(invalidos).Except(visitados).ToList();
             return NeighborsCells;
         }
 
@@ -197,7 +198,7 @@ namespace ColetorLixo.Models
             if(list != null)
                 foreach (Cell c in list)
                 {
-                    if(c.Agent != null && c.Agent.AgentType.Equals(EnumAgentType.GARBAGE))
+                    if(c.Agent != null && ((Agent)c.Agent).AgentType.Equals(EnumAgentType.GARBAGE))
                         ret.Add(c.Agent as Garbage);
                 }
 
@@ -211,7 +212,7 @@ namespace ColetorLixo.Models
         private Boolean IsNeedCharge(Cell actual)
         {
             var cell = FindNearestCharger(actual);
-            if (BatteryLevel == (cell.X - this.X) || BatteryLevel == (cell.Y - this.Y))
+            if (BatteryLevel <= CalculateDistance(this, cell))
                 return true;
 
             return false;
