@@ -40,8 +40,10 @@ namespace ColetorLixo.Utils
                 for (int j = 0; j < matrixVM.Ambient.GetLength(0); j++)
                 {
                     Cell local = matrixVM.Ambient[j, i];
-                    if(local.Agent != null && !string.IsNullOrEmpty(((Agent)local.Agent).ImagePath))
+                    if(local.Agent != null)
                         matrixVM.Html.Append("<td><img src= '" + ((Agent)local.Agent).ImagePath + "' alt='Image' /></td>");
+                    else if (local.Garbage != null)
+                        matrixVM.Html.Append("<td><img src= '" + Garbage.GarbageIconUrl(local.Garbage) + "' alt='Image' /></td>");
                     else
                         matrixVM.Html.Append("<td></td>");
                 }

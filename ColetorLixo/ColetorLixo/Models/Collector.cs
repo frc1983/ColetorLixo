@@ -47,52 +47,76 @@ namespace ColetorLixo.Models
 
         public void MoveCollector(MatrixViewModel matrixVM, Cell colCell)
         {
-            var garbages = LookGarbages(colCell, matrixVM);
-            //if (IsNeedCharge())
-            //{
-            //    Charger nearest = FindNearestCharger(colCell);
+            List<Cell> neighbors = GetNeighbors(colCell, matrixVM);
+            List<Cell> possibleCell = GetPath(colCell, neighbors);
 
-            //    //Guarda o agente atual
-            //    Agent tmp = (Agent)colCell.Agent;
-            //    //Tira o agente da celula antiga
-            //    matrixVM.Ambient[colCell.X, colCell.Y].Agent = null;
-            //    //Busca a nova posicao mais prxima do objetivo
-            //    Cell newCell = MoveToObjectiveWithAStarAlg(colCell, new Cell(nearest.X, nearest.Y), matrixVM);
-            //    //Coloca o agente na celula nova
-            //    matrixVM.Ambient[newCell.X, newCell.Y].Agent = tmp; 
-
-            //    List<Cell> neighbors = GetNeighbors(colCell, matrixVM, false);
-            //    List<Cell> possibleCell = GetPathToColectorTrash(colCell, neighbors);
-            //    if (possibleCell.Any(x => x.Agent != null && ((Agent)x.Agent).AgentType.Equals(EnumAgentType.CHARGER)))
-            //        GoCharge(10);                               
-            //}
-            //else if (IsFullGarbage())
-            //{
-            //    foreach (Garbage garb in GarbageInside)
-            //    {
-            //        Trash nearest = FindNearestTrash(colCell, garb.GarbageType);
-            //        //TODO: GoEmpty(nearest);
-            //    }
-            //}
-            if (garbages.Count() > 0)
+            if (possibleCell.Count == 0)
             {
-                //Guarda o agente atual
-                Agent tmp = (Agent)colCell.Agent;                
-                //Tira o agente da celula antiga
-                matrixVM.Ambient[colCell.X, colCell.Y].Agent = null;
-                //Busca a nova posicao mais prxima do objetivo
-                Cell newCell = MoveToObjectiveWithAStarAlg(colCell, new Cell(garbages.First().X, garbages.First().Y), matrixVM);
+                this.VisitedCells = new List<Cell>();
+                neighbors = GetNeighbors(colCell, matrixVM);
+                possibleCell = GetPath(colCell, neighbors);
+            }
 
-                if (newCell.Agent!= null && ((Agent)newCell.Agent).AgentType.Equals(EnumAgentType.GARBAGE))
-                    AddGarbageLoad((Garbage)newCell.Agent, 1);
+            var garbages = LookGarbages(colCell, neighbors);
+            if (this.GarbageInside.Count == 0)
+                this.FullLoad = false;
 
-                //Coloca o agente na celula nova
-                matrixVM.Ambient[newCell.X, newCell.Y].Agent = tmp;
+            Cell next = null;
+            if (NeedCharge())
+            {
+                this.VisitedCells = new List<Cell>();
+                neighbors = GetNeighbors(colCell, matrixVM, false);
+                possibleCell = GetPath(colCell, neighbors);
+                Charger nearest = FindNearestCharger(colCell);
+
+                if (nearest != null)
+                {
+                    next = MoveToObjectiveWithAStarAlg(colCell, new Cell(nearest.X, nearest.Y), possibleCell);
+                    if (GetRoundNeighbors(colCell, neighbors).Any(x => ((Agent)x.Agent).AgentType.Equals(EnumAgentType.CHARGER)))
+                        GoCharge(50);
+                }
+            }
+            else if (this.FullLoad)
+            {
+                this.VisitedCells = new List<Cell>();
+                neighbors = GetNeighbors(colCell, matrixVM, false);
+                possibleCell = GetPath(colCell, neighbors);
+                Trash nearest = FindNearestTrash(colCell, this.GarbageInside);
+
+                if (nearest == null)
+                    next = MoveToObjectiveWithAStarAlg(colCell, null, possibleCell);
+                else
+                {
+                    next = MoveToObjectiveWithAStarAlg(colCell, new Cell(nearest.X, nearest.Y), possibleCell);
+                    if (GetRoundNeighbors(colCell, neighbors).Any(x => ((Agent)x.Agent).AgentType.Equals(EnumAgentType.TRASH)))
+                        GoEmpty(GetRoundNeighbors(colCell, neighbors)
+                            .Where(x => ((Agent)x.Agent).AgentType.Equals(EnumAgentType.TRASH))
+                            .FirstOrDefault());
+                }
+            }
+            else if (garbages.Count() > 0)
+            {
+                this.VisitedCells = new List<Cell>();
+
+                next = MoveToObjectiveWithAStarAlg(colCell, new Cell(garbages.First().X, garbages.First().Y), possibleCell);
+
+                if (next.Garbage != null)
+                {
+                    AddGarbageLoad(next.Garbage, next.Garbage.GarbageSize);
+                    matrixVM.Ambient[next.X, next.Y].Garbage = null;
+                }
             }
             else
-                Movement.DefaultMovement(matrixVM, colCell);
-
-            this.BatteryLevel--;
+            {
+                next = MoveToObjectiveWithAStarAlg(colCell, null, possibleCell);
+                //Movement.DefaultMovement(matrixVM, colCell);
+            }
+            if (next != null)
+            {
+                Movement.Move(matrixVM, colCell, next);
+                this.VisitedCells.Add(next);
+                this.BatteryLevel--;
+            }
         }
 
         public int CalculateDistance(Cell posInit, Cell posFim)
@@ -100,18 +124,10 @@ namespace ColetorLixo.Models
             return Convert.ToInt32(Math.Sqrt(Math.Pow((posInit.X - posFim.X), 2) + Math.Pow((posInit.Y - posFim.Y), 2)));
         }
 
-        public Cell MoveToObjectiveWithAStarAlg(Cell actual, Cell objective, MatrixViewModel matrix)
+        public Cell MoveToObjectiveWithAStarAlg(Cell actual, Cell objective, List<Cell> possibleCell)
         {
-            List<Cell> neighbors = GetNeighbors(actual, matrix);
-
-            if (neighbors.Count == 0) 
-                return actual;
-
-            //Busca os passos possiveis do agente
-            List<Cell> possibleCell = GetPathToGarbage(actual, neighbors);
-
             if (objective == null)
-                objective = possibleCell.First();
+                objective = Movement.GetNextDefaultMovement(actual, possibleCell);
 
             int max = int.MaxValue;
             foreach (Cell neighbor in possibleCell)
@@ -129,41 +145,48 @@ namespace ColetorLixo.Models
                     }
                 }
             }
-            
+
             return actual;
         }
 
-        private List<Cell> GetPathToGarbage(Cell actual, List<Cell> neighbors)
+        private List<Cell> GetPath(Cell actual, List<Cell> neighbors)
         {
-            return neighbors.Where(x =>
-                (x.Agent == null || ((Agent)x.Agent).AgentType.Equals(EnumAgentType.GARBAGE)) &&
+            var ret = neighbors.Where(x =>
+                (x.Agent == null) &&
                 (
                     ((actual.X + 1).Equals(x.X) && actual.Y.Equals(x.Y)) ||
-                    (actual.X == x.X && (actual.Y + 1).Equals(x.Y)) ||
-                    (actual.X == x.X && (actual.Y - 1).Equals(x.Y)) ||
-                    ((actual.X - 1).Equals(x.X) && actual.Y.Equals(x.Y)) ||
-                    ((actual.X - 1).Equals(x.X) && (actual.Y + 1).Equals(x.Y)) ||
-                    ((actual.X - 1).Equals(x.X) && (actual.Y - 1).Equals(x.Y)) ||                    
                     ((actual.X + 1).Equals(x.X) && (actual.Y + 1).Equals(x.Y)) ||
+                    (actual.X == x.X && (actual.Y + 1).Equals(x.Y)) ||
+                    ((actual.X - 1).Equals(x.X) && (actual.Y + 1).Equals(x.Y)) ||
+                    ((actual.X - 1).Equals(x.X) && actual.Y.Equals(x.Y)) ||
+                    ((actual.X - 1).Equals(x.X) && (actual.Y - 1).Equals(x.Y)) ||
+                    ((actual.X - 1).Equals(x.X) && (actual.Y - 1).Equals(x.Y)) ||
+                    (actual.X == x.X && (actual.Y - 1).Equals(x.Y)) ||
                     ((actual.X + 1).Equals(x.X) && (actual.Y - 1).Equals(x.Y))
-                )).ToList();
+                ));
+
+            return ret.ToList();
         }
 
-        private List<Cell> GetPathToColectorTrash(Cell actual, List<Cell> neighbors)
+        private List<Cell> GetRoundNeighbors(Cell actual, List<Cell> neighbors)
         {
-            return neighbors.Where(x =>
+            var ret = neighbors.Where(x =>
+                (x.Agent != null) &&
                 (
                     ((actual.X + 1).Equals(x.X) && actual.Y.Equals(x.Y)) ||
-                    (actual.X == x.X && (actual.Y + 1).Equals(x.Y)) ||
-                    (actual.X == x.X && (actual.Y - 1).Equals(x.Y)) ||
-                    ((actual.X - 1).Equals(x.X) && actual.Y.Equals(x.Y)) ||
-                    ((actual.X - 1).Equals(x.X) && (actual.Y + 1).Equals(x.Y)) ||
-                    ((actual.X - 1).Equals(x.X) && (actual.Y - 1).Equals(x.Y)) ||
                     ((actual.X + 1).Equals(x.X) && (actual.Y + 1).Equals(x.Y)) ||
+                    (actual.X == x.X && (actual.Y + 1).Equals(x.Y)) ||
+                    ((actual.X - 1).Equals(x.X) && (actual.Y + 1).Equals(x.Y)) ||
+                    ((actual.X - 1).Equals(x.X) && actual.Y.Equals(x.Y)) ||
+                    ((actual.X - 1).Equals(x.X) && (actual.Y - 1).Equals(x.Y)) ||
+                    ((actual.X - 1).Equals(x.X) && (actual.Y - 1).Equals(x.Y)) ||
+                    (actual.X == x.X && (actual.Y - 1).Equals(x.Y)) ||
                     ((actual.X + 1).Equals(x.X) && (actual.Y - 1).Equals(x.Y))
-                )).ToList();
+                ));
+
+            return ret.ToList();
         }
-        
+
         public List<Cell> GetNeighbors(Cell celula, MatrixViewModel matrix, bool removeInvalids = true)
         {
             NeighborsCells = new List<Cell>();
@@ -211,16 +234,15 @@ namespace ColetorLixo.Models
             }
         }
 
-        public List<Garbage> LookGarbages(Cell actual, MatrixViewModel matrixVM)
+        public List<Garbage> LookGarbages(Cell actual, List<Cell> neighbors)
         {
             List<Garbage> ret = new List<Garbage>();
-            var list = GetNeighbors(actual, matrixVM);
 
-            if(list != null)
-                foreach (Cell c in list)
+            if (neighbors != null)
+                foreach (Cell c in neighbors)
                 {
-                    if(c.Agent != null && ((Agent)c.Agent).AgentType.Equals(EnumAgentType.GARBAGE))
-                        ret.Add(c.Agent as Garbage);
+                    if (c.Garbage != null)
+                        ret.Add(c.Garbage);
                 }
 
             return ret;
@@ -230,9 +252,9 @@ namespace ColetorLixo.Models
 
         #region Charger Methods
 
-        private Boolean IsNeedCharge()
+        private Boolean NeedCharge()
         {
-            if (BatteryLevel < 0)
+            if (BatteryLevel <= 0)
                 return true;
 
             return false;
@@ -246,8 +268,8 @@ namespace ColetorLixo.Models
         private Charger FindNearestCharger(Cell actual)
         {
             //retorna o carregador mais proximo do coletor na lista de carregadores do coletor
-            Charger nearest = Chargers.Where(x => !x.UsedPositionOne || !x.UsedPositionTwo ).FirstOrDefault();
-            if(nearest != null)
+            Charger nearest = Chargers.Where(x => !x.UsedPositionOne || !x.UsedPositionTwo).FirstOrDefault();
+            if (nearest != null)
             {
                 //distancia do primeiro da lista
                 double d = CalculateDistance(actual, new Cell(nearest.X, nearest.Y));
@@ -267,37 +289,55 @@ namespace ColetorLixo.Models
 
         #region Trash Methods
 
-        private void GoEmpty(Trash nearestTrashForType)
+        private void GoEmpty(Cell cell)
         {
-            //Movimenta ate a lixeira
-            //Coloca o lixo no Load da Lixeira
-            FullLoad = false;
-            GarbageLoad = 0;
-        }
-
-        private Trash FindNearestTrash(Cell actual, EnumGarbageType enumGarbageType)
-        {
-            //retorna o carregador mais proximo do coletor na lista de carregadores do coletor
-            Trash nearest = Trashes.Where(x => !x.IsFullLoaded && x.GarbageType.Equals(enumGarbageType)).FirstOrDefault();
-            if (nearest != null)
+            if (((Agent)cell.Agent).AgentType.Equals(EnumAgentType.TRASH))
             {
-                //distancia do primeiro da lista
-                double d = CalculateDistance(actual, new Cell(nearest.X, nearest.Y));
-                foreach (Trash trash in Trashes.Where(x => !x.IsFullLoaded && x.GarbageType.Equals(enumGarbageType)))
-        {
-                    //verifica a distancia de cada carregador da lista
-                    double distance = CalculateDistance(actual, new Cell(trash.X, trash.Y));
-                    //se a distancia do carregador for menor, atualiza o primeiro
-                    if (d > distance)
-                        nearest = trash;
+                Trash trash = (Trash)cell.Agent;
+                List<Garbage> toRemove = new List<Garbage>();
+                foreach (Garbage g in this.GarbageInside)
+                {
+                    if (g.GarbageType.Equals(trash.GarbageType))
+                    {
+                        if (trash.FullLoad)
+                            break;
+
+                        toRemove.Add(g);
+                        trash.GarbageLoad++;
+                        this.GarbageLoad--;
+                        if (trash.GarbageLoad == trash.GarbageCapacity)
+                            trash.FullLoad = true;
+                    }
+                }
+                foreach (Garbage g in toRemove)
+                {
+                    this.GarbageInside.Remove(g);
+                    this.FullLoad = false;
                 }
             }
-            return nearest;
         }
 
-        private bool IsFullGarbage()
+        private Trash FindNearestTrash(Cell actual, List<Garbage> garbages)
         {
-            return FullLoad;
+            Trash nearest = Trashes.Where(x => !x.FullLoad).FirstOrDefault();
+            foreach (Garbage g in garbages)
+            {
+                if (nearest != null)
+                {
+                    //distancia do primeiro da lista
+                    double d = CalculateDistance(actual, new Cell(nearest.X, nearest.Y));
+                    foreach (Trash trash in Trashes.Where(x => !x.FullLoad && x.GarbageType.Equals(g.GarbageType)))
+                    {
+                        //verifica a distancia de cada carregador da lista
+                        double distance = CalculateDistance(actual, new Cell(trash.X, trash.Y));
+                        //se a distancia do carregador for menor, atualiza o primeiro
+                        if (d > distance)
+                            nearest = trash;
+                    }
+                }
+            }
+
+            return nearest;
         }
 
         #endregion

@@ -16,24 +16,31 @@ namespace ColetorLixo.Controllers
 
         public ActionResult Index()
         {
-            matrixVM = new MatrixViewModel(15, 15);//TODO: Parametrizar tamanhos ( X, Y )
+            matrixVM = new MatrixViewModel(5, 5);//TODO: Parametrizar tamanhos ( X, Y )
             matrixVM.Html = new StringBuilder();
 
             TempData["matrixVM"] = matrixVM;
             TempData.Keep("matrixVM");
 
-            matrixVM.AddTrash(RandomPositions.GetNextX(matrixVM.Ambient), RandomPositions.GetNextY(matrixVM.Ambient), EnumGarbageType.Metal);
-            matrixVM.AddTrash(RandomPositions.GetNextX(matrixVM.Ambient), RandomPositions.GetNextY(matrixVM.Ambient), EnumGarbageType.Paper);
-            matrixVM.AddTrash(RandomPositions.GetNextX(matrixVM.Ambient), RandomPositions.GetNextY(matrixVM.Ambient), EnumGarbageType.Plastic);
-            matrixVM.AddTrash(RandomPositions.GetNextX(matrixVM.Ambient), RandomPositions.GetNextY(matrixVM.Ambient), EnumGarbageType.Glass);
-            matrixVM.AddCharger(RandomPositions.GetNextX(matrixVM.Ambient), RandomPositions.GetNextY(matrixVM.Ambient));
-            matrixVM.AddGarbage(0, 0, EnumGarbageType.Glass);
-            matrixVM.AddGarbage(0, 2, EnumGarbageType.Plastic);
-            matrixVM.AddGarbage(2, 0, EnumGarbageType.Paper);
-            matrixVM.AddGarbage(RandomPositions.GetNextX(matrixVM.Ambient), RandomPositions.GetNextY(matrixVM.Ambient), EnumGarbageType.Metal);
+            //matrixVM.AddTrash(RandomPositions.GetNextX(matrixVM.Ambient), RandomPositions.GetNextY(matrixVM.Ambient), EnumGarbageType.Metal);
+            //matrixVM.AddTrash(RandomPositions.GetNextX(matrixVM.Ambient), RandomPositions.GetNextY(matrixVM.Ambient), EnumGarbageType.Paper);
+            //matrixVM.AddTrash(RandomPositions.GetNextX(matrixVM.Ambient), RandomPositions.GetNextY(matrixVM.Ambient), EnumGarbageType.Plastic);
+            //matrixVM.AddTrash(RandomPositions.GetNextX(matrixVM.Ambient), RandomPositions.GetNextY(matrixVM.Ambient), EnumGarbageType.Glass);
 
-            //Importante deixar por ultimo para existirem todas lixeiras e carregadores
-            matrixVM.AddCollector(1, 1);
+            //matrixVM.AddCharger(RandomPositions.GetNextX(matrixVM.Ambient), RandomPositions.GetNextY(matrixVM.Ambient));
+
+            //matrixVM.AddGarbage(RandomPositions.GetNextX(matrixVM.Ambient), RandomPositions.GetNextY(matrixVM.Ambient), EnumGarbageType.Glass);
+            //matrixVM.AddGarbage(RandomPositions.GetNextX(matrixVM.Ambient), RandomPositions.GetNextY(matrixVM.Ambient), EnumGarbageType.Plastic);
+            //matrixVM.AddGarbage(RandomPositions.GetNextX(matrixVM.Ambient), RandomPositions.GetNextY(matrixVM.Ambient), EnumGarbageType.Paper);
+            //matrixVM.AddGarbage(RandomPositions.GetNextX(matrixVM.Ambient), RandomPositions.GetNextY(matrixVM.Ambient), EnumGarbageType.Metal);
+            //matrixVM.AddGarbage(RandomPositions.GetNextX(matrixVM.Ambient), RandomPositions.GetNextY(matrixVM.Ambient), EnumGarbageType.Glass);
+            //matrixVM.AddGarbage(RandomPositions.GetNextX(matrixVM.Ambient), RandomPositions.GetNextY(matrixVM.Ambient), EnumGarbageType.Plastic);
+            //matrixVM.AddGarbage(RandomPositions.GetNextX(matrixVM.Ambient), RandomPositions.GetNextY(matrixVM.Ambient), EnumGarbageType.Paper);
+            //matrixVM.AddGarbage(RandomPositions.GetNextX(matrixVM.Ambient), RandomPositions.GetNextY(matrixVM.Ambient), EnumGarbageType.Metal);
+
+            ////Importante deixar por ultimo para existirem todas lixeiras e carregadores
+            //matrixVM.AddCollector(RandomPositions.GetNextX(matrixVM.Ambient), RandomPositions.GetNextY(matrixVM.Ambient));
+            //matrixVM.AddCollector(RandomPositions.GetNextX(matrixVM.Ambient), RandomPositions.GetNextY(matrixVM.Ambient));
 
             return View();
         }
@@ -67,6 +74,36 @@ namespace ColetorLixo.Controllers
             matrixVM = TempData["matrixVM"] as MatrixViewModel;
             TempData["matrixVM"] = matrixVM;
             TempData.Keep("matrixVM");
+        }
+
+        public JsonResult AddAgent(String type, String garbage)
+        {
+            EnumGarbageType garbageType;
+            var result = new { Message = "ERROR: On add new agent" };
+
+            GetMatrix();
+
+            if (EnumGarbageType.TryParse(garbage, out garbageType))
+            {
+                result = new { Message = "OK" };
+                switch (type)
+                {
+                    case "COLLECTOR":
+                        matrixVM.AddCollector(RandomPositions.GetNextX(matrixVM.Ambient), RandomPositions.GetNextY(matrixVM.Ambient));
+                        return new JsonResult() { Data = result, JsonRequestBehavior = JsonRequestBehavior.AllowGet };
+                    case "TRASH":
+                        matrixVM.AddTrash(RandomPositions.GetNextX(matrixVM.Ambient), RandomPositions.GetNextY(matrixVM.Ambient), garbageType);
+                        return new JsonResult() { Data = result, JsonRequestBehavior = JsonRequestBehavior.AllowGet };
+                    case "CHARGER":
+                        matrixVM.AddCharger(RandomPositions.GetNextX(matrixVM.Ambient), RandomPositions.GetNextY(matrixVM.Ambient));
+                        return new JsonResult() { Data = result, JsonRequestBehavior = JsonRequestBehavior.AllowGet };
+                    case "GARBAGE":
+                        matrixVM.AddGarbage(RandomPositions.GetNextX(matrixVM.Ambient), RandomPositions.GetNextY(matrixVM.Ambient), garbageType);
+                        return new JsonResult() { Data = result, JsonRequestBehavior = JsonRequestBehavior.AllowGet };
+                }
+            }
+
+            return new JsonResult() { Data = result, JsonRequestBehavior = JsonRequestBehavior.AllowGet };
         }
     }
 }

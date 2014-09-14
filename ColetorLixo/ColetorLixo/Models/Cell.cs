@@ -10,12 +10,14 @@ namespace ColetorLixo.Models
     {
         public int X { get; set; }
         public int Y { get; set; }
-        public Object Agent { get; set; }
+        public Agent Agent { get; set; }
+        public Garbage Garbage { get; set; }
 
         public Cell(int x, int y)
         {
             this.X = x;
             this.Y = y;
+            Garbage = null;
         }
     }
 }

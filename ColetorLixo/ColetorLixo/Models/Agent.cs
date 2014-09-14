@@ -24,8 +24,6 @@ namespace ColetorLixo.Models
                     return "Content/Images/charger.png";
                 else if (this.AgentType.Equals(EnumAgentType.COLLECTOR))
                     return "Content/Images/collector.png";
-                else if (this.AgentType.Equals(EnumAgentType.GARBAGE))
-                    return GarbageIconUrl(this);
 
                 return null;
             }
@@ -51,28 +49,29 @@ namespace ColetorLixo.Models
         {
             Trash garbage = this as Trash;
             if (garbage.GarbageType.Equals(EnumGarbageType.Metal))
+            {
+                if(garbage.FullLoad)
+                    return "Content/Images/trash_closed_metal.png";
                 return "Content/Images/trash_open_metal.png";
+            }
             else if (garbage.GarbageType.Equals(EnumGarbageType.Paper))
+            {
+                if (garbage.FullLoad)
+                    return "Content/Images/trash_closed_paper.png";
                 return "Content/Images/trash_open_paper.png";
+            }
             else if (garbage.GarbageType.Equals(EnumGarbageType.Plastic))
+            {
+                if (garbage.FullLoad)
+                    return "Content/Images/trash_closed_plastic.png";
                 return "Content/Images/trash_open_plastic.png";
+            }
             else if (garbage.GarbageType.Equals(EnumGarbageType.Glass))
+            {
+                if (garbage.FullLoad)
+                    return "Content/Images/trash_closed_glass.png";
                 return "Content/Images/trash_open_glass.png";
-
-            return null;
-        }
-
-        private string GarbageIconUrl(Models.Agent agent)
-        {
-            Garbage garbage = this as Garbage;
-            if (garbage.GarbageType.Equals(EnumGarbageType.Metal))
-                return "Content/Images/garbage_metal.png";
-            else if (garbage.GarbageType.Equals(EnumGarbageType.Paper))
-                return "Content/Images/garbage_paper.png";
-            else if (garbage.GarbageType.Equals(EnumGarbageType.Plastic))
-                return "Content/Images/garbage_plastic.png";
-            else if (garbage.GarbageType.Equals(EnumGarbageType.Glass))
-                return "Content/Images/garbage_glass.png";
+            }
 
             return null;
         }

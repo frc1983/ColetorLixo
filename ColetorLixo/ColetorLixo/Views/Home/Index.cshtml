@@ -16,8 +16,28 @@
     <div id="status"></div>
 </div>
 
-<div class="matrix left">
-    <label for="log">Ambiente</label>
+<div class="matrix left">        
+    <div class="controls clear">
+        <label>Adicionar agente:</label>
+        <label for="agent" class="left">Tipo de agente:</label>
+        <select id="agent" class="left">
+          <option value="COLLECTOR">Coletor</option>
+          <option value="TRASH">Lixeira</option>
+          <option value="CHARGER">Carregador</option>
+          <option value="GARBAGE">Lixo</option>
+        </select>
+
+        <label id="label_garbage_type" for="garbage" class="left" style="display: none">Tipo de lixo:</label>
+        <select id="garbage" class="left" style="display: none">
+          <option value="Glass">Vidro</option>
+          <option value="Paper">Papel</option>
+          <option value="Metal">Metal</option>
+          <option value="Plastic">Plástico</option>
+        </select>
+
+        <input id="add" class="left" type="button" value="Adicionar" class="button left" />
+    </div>
+    <label for="log" class="clear">Ambiente</label>
     <div id="container"></div>
 </div>
 
@@ -47,6 +67,20 @@
         $("#stop").click(function () {
             location.reload();
         });
+
+        $("#add").click(function () {
+            AddAgent($('#agent').val(), $('#garbage').val());
+        });
+
+        $("#agent").change(function () {
+            $("#label_garbage_type").hide();
+            $("#garbage").hide();
+
+            if ($('#agent').val() == 'TRASH' || $('#agent').val() == 'GARBAGE') {
+                $("#label_garbage_type").show();
+                $("#garbage").show();
+            }
+        });
     });
 
     function CallPopulateMatrix() {
@@ -55,7 +89,6 @@
             async: true,
             url: '@Url.Action("PopulateMatrix")',
             success: function (data) {
-                console.log(data)
                 $("#container").html(data.Html);
                 $("#status").html(data.Status);
 
@@ -82,4 +115,21 @@
             }
         });
     }
+
+    function AddAgent(agentType, garbageType) {
+        $.ajax({
+            dataType: "json",
+            async: true,
+            url: '@Url.Action("AddAgent")',
+            data: { type: agentType, garbage: garbageType },
+            success: function (data) {
+                DrawTable();
+            },
+            error: function (data) {
+                alert(data.result);
+            }
+        });
+    }
+
+
 </script>

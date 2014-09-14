@@ -10,7 +10,6 @@ namespace ColetorLixo.Models
     {
         TRASH,
         COLLECTOR,
-        CHARGER,
-        GARBAGE
+        CHARGER
     }
 }

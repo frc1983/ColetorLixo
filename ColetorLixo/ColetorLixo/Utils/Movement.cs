@@ -11,78 +11,145 @@ namespace ColetorLixo.Utils
     {
         #region Movimentos Simples
 
-        public static void DefaultMovement(MatrixViewModel matrixVM, Cell colCell)
-        {
-            if (!((Collector)colCell.Agent).MoveLeft)
-            {
-                if (colCell.X + 1 < matrixVM.Ambient.GetLength(0) &&
-                (matrixVM.Ambient[colCell.X + 1, colCell.Y].Agent == null ||
-                ((Agent)matrixVM.Ambient[colCell.X + 1, colCell.Y].Agent).AgentType.Equals(EnumAgentType.GARBAGE)))
-                {
-                    MoveToRight(matrixVM, colCell);
-                }
-                else if (colCell.X + 1 == matrixVM.Ambient.GetLength(0) &&
-                (matrixVM.Ambient[colCell.X, colCell.Y + 1].Agent == null ||
-                    ((Agent)matrixVM.Ambient[colCell.X, colCell.Y + 1].Agent).AgentType.Equals(EnumAgentType.GARBAGE)))
-                {
-                    ((Collector)colCell.Agent).MoveLeft = true;
-                    MoveToDown(matrixVM, colCell);                    
-                }
-            }
-            else if (((Collector)colCell.Agent).MoveLeft)
-            {
-                if (colCell.X - 1 >= 0 &&
-                (matrixVM.Ambient[colCell.X - 1, colCell.Y].Agent == null ||
-                ((Agent)matrixVM.Ambient[colCell.X - 1, colCell.Y].Agent).AgentType.Equals(EnumAgentType.GARBAGE)))
-                {
-                    MoveToLeft(matrixVM, colCell);
-                }
-                else if (colCell.X - 1 < 0 &&
-                    (matrixVM.Ambient[colCell.X, colCell.Y + 1].Agent == null ||
-                    ((Agent)matrixVM.Ambient[colCell.X, colCell.Y + 1].Agent).AgentType.Equals(EnumAgentType.GARBAGE)))
-                {
-                    ((Collector)colCell.Agent).MoveLeft = false;
-                    MoveToDown(matrixVM, colCell);                    
-                }
-            }
-        }
+        //public static void DefaultMovement(MatrixViewModel matrixVM, Cell colCell)
+        //{
+        //    if (!((Collector)colCell.Agent).MoveLeft)
+        //    {
+        //        if (colCell.X + 1 < matrixVM.Ambient.GetLength(0) &&
+        //        (matrixVM.Ambient[colCell.X + 1, colCell.Y].Agent == null ||
+        //        ((Agent)matrixVM.Ambient[colCell.X + 1, colCell.Y].Agent).AgentType.Equals(EnumAgentType.GARBAGE)))
+        //        {
+        //            MoveToRight(matrixVM, colCell);
+        //        }
+        //        else if (colCell.X + 1 == matrixVM.Ambient.GetLength(0) &&
+        //        (matrixVM.Ambient[colCell.X, colCell.Y + 1].Agent == null ||
+        //            ((Agent)matrixVM.Ambient[colCell.X, colCell.Y + 1].Agent).AgentType.Equals(EnumAgentType.GARBAGE)))
+        //        {
+        //            ((Collector)colCell.Agent).MoveLeft = true;
+        //            MoveToDown(matrixVM, colCell);                    
+        //        }
+        //    }
+        //    else if (((Collector)colCell.Agent).MoveLeft)
+        //    {
+        //        if (colCell.X - 1 >= 0 &&
+        //        (matrixVM.Ambient[colCell.X - 1, colCell.Y].Agent == null ||
+        //        ((Agent)matrixVM.Ambient[colCell.X - 1, colCell.Y].Agent).AgentType.Equals(EnumAgentType.GARBAGE)))
+        //        {
+        //            MoveToLeft(matrixVM, colCell);
+        //        }
+        //        else if (colCell.X - 1 < 0 &&
+        //            (matrixVM.Ambient[colCell.X, colCell.Y + 1].Agent == null ||
+        //            ((Agent)matrixVM.Ambient[colCell.X, colCell.Y + 1].Agent).AgentType.Equals(EnumAgentType.GARBAGE)))
+        //        {
+        //            ((Collector)colCell.Agent).MoveLeft = false;
+        //            MoveToDown(matrixVM, colCell);                    
+        //        }
+        //    }
+        //}
 
-        public static void MoveToRight(MatrixViewModel matrixVM, Cell colCell)
+        //public static void MoveToRight(MatrixViewModel matrixVM, Cell colCell)
+        //{
+        //    Agent tmp = (Agent)colCell.Agent;
+        //    ((Collector)tmp).MoveLeft = false;
+        //    matrixVM.Ambient[colCell.X, colCell.Y].Agent = null;
+        //    colCell.X = colCell.X + 1;
+        //    matrixVM.Ambient[colCell.X, colCell.Y].Agent = tmp;            
+        //}
+
+        //public static void MoveToLeft(MatrixViewModel matrixVM, Cell colCell)
+        //{
+        //    Agent tmp = (Agent)colCell.Agent;
+        //    ((Collector)tmp).MoveLeft = true;
+        //    matrixVM.Ambient[colCell.X, colCell.Y].Agent = null;
+        //    colCell.X = colCell.X - 1;
+        //    matrixVM.Ambient[colCell.X, colCell.Y].Agent = tmp;            
+        //}
+
+        //public static void MoveToDown(MatrixViewModel matrixVM, Cell colCell)
+        //{
+        //    Agent tmp = (Agent)colCell.Agent;
+        //    ((Collector)tmp).MoveUp = false;
+        //    matrixVM.Ambient[colCell.X, colCell.Y].Agent = null;
+        //    colCell.Y = colCell.Y + 1;
+        //    matrixVM.Ambient[colCell.X, colCell.Y].Agent = tmp;            
+        //}
+
+        //public static void MoveToUp(MatrixViewModel matrixVM, Cell colCell)
+        //{
+        //    Agent tmp = (Agent)colCell.Agent;
+        //    ((Collector)tmp).MoveUp = true;
+        //    matrixVM.Ambient[colCell.X, colCell.Y].Agent = null;
+        //    colCell.Y = colCell.Y + 1;
+        //    matrixVM.Ambient[colCell.X, colCell.Y].Agent = tmp;            
+        //}
+
+        public static void Move(MatrixViewModel matrixVM, Cell colCell, Cell newCell)
         {
             Agent tmp = (Agent)colCell.Agent;
-            ((Collector)tmp).MoveLeft = false;
             matrixVM.Ambient[colCell.X, colCell.Y].Agent = null;
-            colCell.X = colCell.X + 1;
-            matrixVM.Ambient[colCell.X, colCell.Y].Agent = tmp;            
-        }
-
-        public static void MoveToLeft(MatrixViewModel matrixVM, Cell colCell)
-        {
-            Agent tmp = (Agent)colCell.Agent;
-            ((Collector)tmp).MoveLeft = true;
-            matrixVM.Ambient[colCell.X, colCell.Y].Agent = null;
-            colCell.X = colCell.X - 1;
-            matrixVM.Ambient[colCell.X, colCell.Y].Agent = tmp;            
-        }
-
-        public static void MoveToDown(MatrixViewModel matrixVM, Cell colCell)
-        {
-            Agent tmp = (Agent)colCell.Agent;
-            ((Collector)tmp).MoveUp = false;
-            matrixVM.Ambient[colCell.X, colCell.Y].Agent = null;
-            colCell.Y = colCell.Y + 1;
-            matrixVM.Ambient[colCell.X, colCell.Y].Agent = tmp;            
-        }
-
-        public static void MoveToUp(MatrixViewModel matrixVM, Cell colCell)
-        {
-            Agent tmp = (Agent)colCell.Agent;
-            ((Collector)tmp).MoveUp = true;
-            matrixVM.Ambient[colCell.X, colCell.Y].Agent = null;
-            colCell.Y = colCell.Y + 1;
-            matrixVM.Ambient[colCell.X, colCell.Y].Agent = tmp;            
+            matrixVM.Ambient[newCell.X, newCell.Y].Agent = tmp;  
         }
 
         #endregion
+
+        internal static Cell GetNextDefaultMovement(Cell actual, List<Cell> possibleCell)
+        {
+            Cell objective = null;
+            Collector actualColector = ((Collector)actual.Agent);
+            
+            if (!actualColector.MoveLeft)
+            {
+                objective = possibleCell.Where(y => y.Y == actual.Y && y.X > actual.X).FirstOrDefault();
+                if (objective == null)
+                {
+                    if (!actualColector.MoveUp)
+                    {
+                        objective = possibleCell.Where(y => y.Y > actual.Y).OrderByDescending(x => x.X).FirstOrDefault();
+                        if (objective == null)
+                        {
+                            objective = possibleCell.Where(y => y.Y < actual.Y).OrderByDescending(x => x.X).First();
+                            actualColector.MoveUp = true;
+                        }
+                    }
+                    else
+                    {
+                        objective = possibleCell.Where(y => y.Y < actual.Y).OrderByDescending(x => x.X).FirstOrDefault();
+                        if (objective == null)
+                        {
+                            objective = possibleCell.Where(y => y.Y > actual.Y).OrderByDescending(x => x.X).First();
+                            actualColector.MoveUp = false;
+                        }
+                    }
+                    actualColector.MoveLeft = true;
+                }
+            }
+            else
+            {
+                objective = possibleCell.Where(y => y.Y == actual.Y && y.X < actual.X).FirstOrDefault();
+                if (objective == null)
+                {
+                    if (!actualColector.MoveUp)
+                    {
+                        objective = possibleCell.Where(y => y.Y > actual.Y).OrderByDescending(x => x.X).FirstOrDefault();
+                        if (objective == null)
+                        {
+                            objective = possibleCell.Where(y => y.Y < actual.Y).OrderByDescending(x => x.X).First();
+                            actualColector.MoveUp = true;
+                        }
+                    }
+                    else
+                    {
+                        objective = possibleCell.Where(y => y.Y < actual.Y).OrderByDescending(x => x.X).FirstOrDefault();
+                        if (objective == null)
+                        {
+                            objective = possibleCell.Where(y => y.Y > actual.Y).OrderByDescending(x => x.X).First();
+                            actualColector.MoveUp = false;
+                        }
+                    }
+                    actualColector.MoveLeft = false;
+                }
+            }
+            return objective;
+        }
     }
 }
