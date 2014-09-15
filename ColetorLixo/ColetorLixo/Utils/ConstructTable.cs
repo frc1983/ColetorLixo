@@ -35,7 +35,9 @@ namespace ColetorLixo.Utils
         {
             for (int i = 0; i < matrixVM.Ambient.GetLength(1); i++)
             {
-                matrixVM.Html.Append("<tr><td> " + (i + 1) + "</td>");
+
+
+                matrixVM.Html.Append("<tr><td class='bk'> " + (i + 1) + "</td>");
 
                 for (int j = 0; j < matrixVM.Ambient.GetLength(0); j++)
                 {

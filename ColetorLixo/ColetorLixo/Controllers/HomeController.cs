@@ -18,7 +18,8 @@ namespace ColetorLixo.Controllers
         {
             matrixVM = new MatrixViewModel(15, 15);
 
-            if (Request["X"] != null && Request["Y"] != null)
+            if (!string.IsNullOrEmpty(Request["X"]) && !string.IsNullOrEmpty(Request["Y"]) &&
+                Convert.ToInt32(Request["X"].ToString()) > 0 && Convert.ToInt32(Request["Y"].ToString()) > 0)
                 matrixVM = new MatrixViewModel(Convert.ToInt32(Request["X"].ToString()), Convert.ToInt32(Request["Y"].ToString()));
 
             matrixVM.Html = new StringBuilder();
