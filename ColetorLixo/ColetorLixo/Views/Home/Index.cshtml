@@ -6,6 +6,18 @@
 <h2>Coletor de Lixo</h2>
 
 <div class="controls left">
+    <label for="interval">Tamanho da matriz:</label>
+    <div class="left">
+        <label for="interval" class="left">X:</label>
+        <input type="number" id="x" class="input-min" />
+    </div>
+    <div class="left">
+        <label for="interval" class="left">Y:</label>
+        <input type="number" id="y" class="input-min" />
+    </div>
+    <input id="change-size" type="button" value="Alterar Tamanho" class="button input" />
+    <br class="clear" />
+
     <label for="interval">Intervalo (em segundos)</label>
     <input type="number" id="interval" class="input" />
     <br />
@@ -16,23 +28,23 @@
     <div id="status"></div>
 </div>
 
-<div class="matrix left">        
+<div class="matrix left">
     <div class="controls clear">
         <label>Adicionar agente:</label>
         <label for="agent" class="left">Tipo de agente:</label>
         <select id="agent" class="left">
-          <option value="COLLECTOR">Coletor</option>
-          <option value="TRASH">Lixeira</option>
-          <option value="CHARGER">Carregador</option>
-          <option value="GARBAGE">Lixo</option>
+            <option value="COLLECTOR">Coletor</option>
+            <option value="TRASH">Lixeira</option>
+            <option value="CHARGER">Carregador</option>
+            <option value="GARBAGE">Lixo</option>
         </select>
 
         <label id="label_garbage_type" for="garbage" class="left" style="display: none">Tipo de lixo:</label>
         <select id="garbage" class="left" style="display: none">
-          <option value="Glass">Vidro</option>
-          <option value="Paper">Papel</option>
-          <option value="Metal">Metal</option>
-          <option value="Plastic">Plástico</option>
+            <option value="Glass">Vidro</option>
+            <option value="Paper">Papel</option>
+            <option value="Metal">Metal</option>
+            <option value="Plastic">Plástico</option>
         </select>
 
         <input id="add" class="left" type="button" value="Adicionar" class="button left" />
@@ -80,6 +92,11 @@
                 $("#label_garbage_type").show();
                 $("#garbage").show();
             }
+        });
+
+        $("#change-size").click(function () {
+            console.log(window.location.origin + "/?x=" + $("#x").val() + "&y=" + $("#y").val())
+            window.location = window.location.origin + "/?x=" + $("#x").val() + "&y=" + $("#y").val();
         });
     });
 

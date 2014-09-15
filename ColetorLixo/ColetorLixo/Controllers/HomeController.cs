@@ -16,7 +16,11 @@ namespace ColetorLixo.Controllers
 
         public ActionResult Index()
         {
-            matrixVM = new MatrixViewModel(5, 5);//TODO: Parametrizar tamanhos ( X, Y )
+            matrixVM = new MatrixViewModel(15, 15);
+
+            if (Request["X"] != null && Request["Y"] != null)
+                matrixVM = new MatrixViewModel(Convert.ToInt32(Request["X"].ToString()), Convert.ToInt32(Request["Y"].ToString()));
+
             matrixVM.Html = new StringBuilder();
 
             TempData["matrixVM"] = matrixVM;
@@ -33,13 +37,8 @@ namespace ColetorLixo.Controllers
             //matrixVM.AddGarbage(RandomPositions.GetNextX(matrixVM.Ambient), RandomPositions.GetNextY(matrixVM.Ambient), EnumGarbageType.Plastic);
             //matrixVM.AddGarbage(RandomPositions.GetNextX(matrixVM.Ambient), RandomPositions.GetNextY(matrixVM.Ambient), EnumGarbageType.Paper);
             //matrixVM.AddGarbage(RandomPositions.GetNextX(matrixVM.Ambient), RandomPositions.GetNextY(matrixVM.Ambient), EnumGarbageType.Metal);
-            //matrixVM.AddGarbage(RandomPositions.GetNextX(matrixVM.Ambient), RandomPositions.GetNextY(matrixVM.Ambient), EnumGarbageType.Glass);
-            //matrixVM.AddGarbage(RandomPositions.GetNextX(matrixVM.Ambient), RandomPositions.GetNextY(matrixVM.Ambient), EnumGarbageType.Plastic);
-            //matrixVM.AddGarbage(RandomPositions.GetNextX(matrixVM.Ambient), RandomPositions.GetNextY(matrixVM.Ambient), EnumGarbageType.Paper);
-            //matrixVM.AddGarbage(RandomPositions.GetNextX(matrixVM.Ambient), RandomPositions.GetNextY(matrixVM.Ambient), EnumGarbageType.Metal);
 
             ////Importante deixar por ultimo para existirem todas lixeiras e carregadores
-            //matrixVM.AddCollector(RandomPositions.GetNextX(matrixVM.Ambient), RandomPositions.GetNextY(matrixVM.Ambient));
             //matrixVM.AddCollector(RandomPositions.GetNextX(matrixVM.Ambient), RandomPositions.GetNextY(matrixVM.Ambient));
 
             return View();
@@ -89,13 +88,13 @@ namespace ColetorLixo.Controllers
                 switch (type)
                 {
                     case "COLLECTOR":
-                        matrixVM.AddCollector(RandomPositions.GetNextX(matrixVM.Ambient), RandomPositions.GetNextY(matrixVM.Ambient));
+                        matrixVM.AddCollector(RandomPositions.GetNextX(matrixVM.Ambient), RandomPositions.GetNextY(matrixVM.Ambient), 10, 10);
                         return new JsonResult() { Data = result, JsonRequestBehavior = JsonRequestBehavior.AllowGet };
                     case "TRASH":
-                        matrixVM.AddTrash(RandomPositions.GetNextX(matrixVM.Ambient), RandomPositions.GetNextY(matrixVM.Ambient), garbageType);
+                        matrixVM.AddTrash(RandomPositions.GetNextX(matrixVM.Ambient), RandomPositions.GetNextY(matrixVM.Ambient), 2, garbageType);
                         return new JsonResult() { Data = result, JsonRequestBehavior = JsonRequestBehavior.AllowGet };
                     case "CHARGER":
-                        matrixVM.AddCharger(RandomPositions.GetNextX(matrixVM.Ambient), RandomPositions.GetNextY(matrixVM.Ambient));
+                        matrixVM.AddCharger(RandomPositions.GetNextX(matrixVM.Ambient), RandomPositions.GetNextY(matrixVM.Ambient), 50);
                         return new JsonResult() { Data = result, JsonRequestBehavior = JsonRequestBehavior.AllowGet };
                     case "GARBAGE":
                         matrixVM.AddGarbage(RandomPositions.GetNextX(matrixVM.Ambient), RandomPositions.GetNextY(matrixVM.Ambient), garbageType);

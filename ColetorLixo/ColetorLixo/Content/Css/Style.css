@@ -1,5 +1,5 @@
 ﻿body {
-    width: 1115px;
+    width: 1200px;
     margin: 0 auto;
     font-family: Arial;
     font-size: 14px;
@@ -43,6 +43,12 @@ td img{
 .input {
     border: 1px solid #9b9b9b;
     min-width: 200px;
+    min-height: 25px;
+}
+
+.input-min {
+    border: 1px solid #9b9b9b;
+    max-width: 50px;
     min-height: 25px;
 }
 

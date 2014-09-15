@@ -34,9 +34,9 @@ namespace ColetorLixo.ViewModels
 
         #region Methods
 
-        internal void AddCollector(int x, int y)
+        internal void AddCollector(int x, int y, int capacity, int charge)
         {
-            AddAgent(new Collector(x, y, 4, 10));
+            AddAgent(new Collector(x, y, capacity, charge));
         }
 
         internal void AddGarbage(int x, int y, EnumGarbageType garbageType)
@@ -55,14 +55,14 @@ namespace ColetorLixo.ViewModels
             }
         }
 
-        internal void AddTrash(int x, int y, EnumGarbageType garbageType)
+        internal void AddTrash(int x, int y, int capacity, EnumGarbageType garbageType)
         {
-            AddAgent(new Trash(x, y, 2, garbageType));
+            AddAgent(new Trash(x, y, capacity, garbageType));
         }
 
-        internal void AddCharger(int x, int y)
+        internal void AddCharger(int x, int y, int charge)
         {
-            AddAgent(new Charger(x, y, 2));
+            AddAgent(new Charger(x, y, charge));
         }
 
         private void AddAgent(Agent agent)
