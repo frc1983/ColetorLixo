@@ -37,8 +37,8 @@ namespace ColetorLixo.Utils
                 else if (agent.AgentType == EnumAgentType.CHARGER)
                 {
                     matrixVM.Status.Append("Carregando:<br />");
-                    matrixVM.Status.Append("    Na posição 1: " + ((Charger)agent).UsedPositionOne + "<br />");
-                    matrixVM.Status.Append("    Na posição 2: " + ((Charger)agent).UsedPositionTwo + "<br />");
+                    matrixVM.Status.Append("    Na posição 1: " + (((Charger)agent).UsedPositionOne != null).ToString() + "<br />");
+                    matrixVM.Status.Append("    Na posição 2: " + (((Charger)agent).UsedPositionTwo != null).ToString() + "<br />");
                 }
                 matrixVM.Status.Append("<br />");
             }

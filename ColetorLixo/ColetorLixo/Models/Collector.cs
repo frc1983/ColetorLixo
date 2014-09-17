@@ -22,6 +22,8 @@ namespace ColetorLixo.Models
         public Cell ActualCell { get; set; }
         public Boolean MoveLeft { get; set; }
         public Boolean MoveUp { get; set; }
+        public Boolean IsCharged { get; set; }
+        public Cell NextCell { get; set; }
 
         #endregion
 
@@ -30,7 +32,8 @@ namespace ColetorLixo.Models
         public Collector(int x, int y, int capacity, int battery)
             : base(x, y, EnumAgentType.COLLECTOR, capacity)
         {
-            this.BatteryLevel = battery;
+            BatteryLevel = battery;
+            IsCharged = true;
             ActualState = EnumCollectorStates.LIMPAR;
             GarbageInside = new List<Garbage>();
             Chargers = new List<Charger>();
@@ -62,18 +65,27 @@ namespace ColetorLixo.Models
                 this.FullLoad = false;
 
             Cell next = null;
-            if (NeedCharge())
+            var hasNextCell = this.NextCell != null;
+            if (NeedCharge(matrixVM, hasNextCell))
             {
                 this.VisitedCells = new List<Cell>();
                 neighbors = GetNeighbors(colCell, matrixVM, false);
                 possibleCell = GetPath(colCell, neighbors);
                 Charger nearest = FindNearestCharger(colCell);
 
-                if (nearest != null)
+                if (hasNextCell)
+                {
+                    next = this.NextCell;
+                    GoCharge(10, GetRoundNeighbors(colCell, neighbors).Where(x => ((Agent)x.Agent).AgentType.Equals(EnumAgentType.CHARGER)).Single());
+                }
+                else if (nearest != null)
                 {
                     next = MoveToObjectiveWithAStarAlg(colCell, new Cell(nearest.X, nearest.Y), possibleCell);
                     if (GetRoundNeighbors(colCell, neighbors).Any(x => ((Agent)x.Agent).AgentType.Equals(EnumAgentType.CHARGER)))
-                        GoCharge(50);
+                    {
+                        GoCharge(10, GetRoundNeighbors(colCell, neighbors).Where(x => ((Agent)x.Agent).AgentType.Equals(EnumAgentType.CHARGER)).Single());
+                        this.NextCell = next;
+                    }
                 }
             }
             else if (this.FullLoad)
@@ -109,9 +121,8 @@ namespace ColetorLixo.Models
             else
             {
                 next = MoveToObjectiveWithAStarAlg(colCell, null, possibleCell);
-                //Movement.DefaultMovement(matrixVM, colCell);
             }
-            if (next != null)
+            if (next != null && BatteryLevel > 0 && !hasNextCell)
             {
                 Movement.Move(matrixVM, colCell, next);
                 this.VisitedCells.Add(next);
@@ -155,8 +166,8 @@ namespace ColetorLixo.Models
                 (x.Agent == null) &&
                 (
                     ((actual.X + 1).Equals(x.X) && actual.Y.Equals(x.Y)) ||
-                    ((actual.X + 1).Equals(x.X) && (actual.Y + 1).Equals(x.Y)) ||
                     (actual.X == x.X && (actual.Y + 1).Equals(x.Y)) ||
+                    ((actual.X + 1).Equals(x.X) && (actual.Y + 1).Equals(x.Y)) ||
                     ((actual.X - 1).Equals(x.X) && (actual.Y + 1).Equals(x.Y)) ||
                     ((actual.X - 1).Equals(x.X) && actual.Y.Equals(x.Y)) ||
                     ((actual.X - 1).Equals(x.X) && (actual.Y - 1).Equals(x.Y)) ||
@@ -174,8 +185,8 @@ namespace ColetorLixo.Models
                 (x.Agent != null) &&
                 (
                     ((actual.X + 1).Equals(x.X) && actual.Y.Equals(x.Y)) ||
-                    ((actual.X + 1).Equals(x.X) && (actual.Y + 1).Equals(x.Y)) ||
                     (actual.X == x.X && (actual.Y + 1).Equals(x.Y)) ||
+                    ((actual.X + 1).Equals(x.X) && (actual.Y + 1).Equals(x.Y)) ||
                     ((actual.X - 1).Equals(x.X) && (actual.Y + 1).Equals(x.Y)) ||
                     ((actual.X - 1).Equals(x.X) && actual.Y.Equals(x.Y)) ||
                     ((actual.X - 1).Equals(x.X) && (actual.Y - 1).Equals(x.Y)) ||
@@ -252,28 +263,53 @@ namespace ColetorLixo.Models
 
         #region Charger Methods
 
-        private Boolean NeedCharge()
+        private Boolean NeedCharge(MatrixViewModel matrixVM, Boolean need)
         {
-            if (BatteryLevel <= 0)
-                return true;
+            if (need) return true;
+
+            Cell charger = FindNearestCharger(this);
+
+            if (charger != null)
+            {
+                var more = matrixVM.Ambient.GetLength(0);
+                if (matrixVM.Ambient.GetLength(1) > matrixVM.Ambient.GetLength(0))
+                    more = matrixVM.Ambient.GetLength(1);
+
+                if (BatteryLevel <= more)
+                    return true;
+            }
 
             return false;
         }
 
-        private void GoCharge(int charge)
+        private void GoCharge(int charge, Cell charger)
         {
-            BatteryLevel = charge;
+            Charger c = charger.Agent as Charger;
+
+            if (c.HasEmptyPosition())
+                c.SetAgentInCharge(this);
+
+            if (BatteryLevel < charge)
+                BatteryLevel += 1;
+            else
+            {
+                this.NextCell = null;
+                c.UnsetAgentInCharge(this);
+            }
         }
 
         private Charger FindNearestCharger(Cell actual)
         {
             //retorna o carregador mais proximo do coletor na lista de carregadores do coletor
-            Charger nearest = Chargers.Where(x => !x.UsedPositionOne || !x.UsedPositionTwo).FirstOrDefault();
+            Charger nearest = Chargers
+                .Where(x => x.UsedPositionOne == null || x.UsedPositionTwo == null)
+                .FirstOrDefault();
+
             if (nearest != null)
             {
                 //distancia do primeiro da lista
                 double d = CalculateDistance(actual, new Cell(nearest.X, nearest.Y));
-                foreach (Charger charger in Chargers.Where(x => !x.UsedPositionOne || !x.UsedPositionTwo))
+                foreach (Charger charger in Chargers.Where(x => x.UsedPositionOne == null || x.UsedPositionTwo == null))
                 {
                     //verifica a distancia de cada carregador da lista
                     double distance = CalculateDistance(actual, new Cell(charger.X, charger.Y));

@@ -7,30 +7,30 @@ namespace ColetorLixo.Models
 {
     public class Charger : Agent
     {
-        public Boolean UsedPositionOne { get; set; }
-        public Boolean UsedPositionTwo { get; set; }
+        public Agent UsedPositionOne { get; set; }
+        public Agent UsedPositionTwo { get; set; }
 
         public Charger(int x, int y, int capacity) : base(x, y, EnumAgentType.CHARGER, capacity)
         {
-            this.UsedPositionOne = false;
-            this.UsedPositionTwo = false;
+            this.UsedPositionOne = null;
+            this.UsedPositionTwo = null;
         }
 
-        public void LoadCollector()
+        public Boolean HasEmptyPosition()
         {
-            if (HasEmptyPosition())
-            {
-                if (!UsedPositionOne)
-                    UsedPositionOne = true;
-                else if (!UsedPositionTwo)
-                    UsedPositionTwo = true;
-            }
-
+            return UsedPositionOne == null || UsedPositionTwo == null;
         }
 
-        private Boolean HasEmptyPosition()
+        internal void SetAgentInCharge(Collector c)
         {
-            return UsedPositionOne && UsedPositionTwo;
+            if (this.UsedPositionOne == null || this.UsedPositionOne == c) this.UsedPositionOne = c;
+            else if (this.UsedPositionTwo == null || this.UsedPositionTwo == c) this.UsedPositionTwo = c;
+        }
+
+        internal void UnsetAgentInCharge(Collector c)
+        {
+            if (this.UsedPositionOne != null && this.UsedPositionOne == c) this.UsedPositionOne = null;
+            if (this.UsedPositionTwo != null && this.UsedPositionTwo == c) this.UsedPositionTwo = null;
         }
     }
 }

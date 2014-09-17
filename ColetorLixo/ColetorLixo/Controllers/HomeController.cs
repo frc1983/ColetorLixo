@@ -92,10 +92,10 @@ namespace ColetorLixo.Controllers
                         matrixVM.AddCollector(RandomPositions.GetNextX(matrixVM.Ambient), RandomPositions.GetNextY(matrixVM.Ambient), 10, 10);
                         return new JsonResult() { Data = result, JsonRequestBehavior = JsonRequestBehavior.AllowGet };
                     case "TRASH":
-                        matrixVM.AddTrash(RandomPositions.GetNextX(matrixVM.Ambient), RandomPositions.GetNextY(matrixVM.Ambient), 2, garbageType);
+                        matrixVM.AddTrash(RandomPositions.GetNextX(matrixVM.Ambient), RandomPositions.GetNextY(matrixVM.Ambient), 10, garbageType);
                         return new JsonResult() { Data = result, JsonRequestBehavior = JsonRequestBehavior.AllowGet };
                     case "CHARGER":
-                        matrixVM.AddCharger(RandomPositions.GetNextX(matrixVM.Ambient), RandomPositions.GetNextY(matrixVM.Ambient), 50);
+                        matrixVM.AddCharger(RandomPositions.GetNextX(matrixVM.Ambient), RandomPositions.GetNextY(matrixVM.Ambient), 6);
                         return new JsonResult() { Data = result, JsonRequestBehavior = JsonRequestBehavior.AllowGet };
                     case "GARBAGE":
                         matrixVM.AddGarbage(RandomPositions.GetNextX(matrixVM.Ambient), RandomPositions.GetNextY(matrixVM.Ambient), garbageType);
