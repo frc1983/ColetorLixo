@@ -67,17 +67,21 @@ namespace ColetorLixo.ViewModels
 
         private void AddAgent(Agent agent)
         {
-            if (Ambient[agent.X, agent.Y].Agent == null && Ambient[agent.X, agent.Y].Garbage == null)
+            if (HasEmptyCell())
             {
-                Ambient[agent.X, agent.Y].Agent = agent;
-                UpdateInvalidCells();
-            }
-            else
-            {
-                agent.X = RandomPositions.GetNextX(Ambient);
-                agent.Y = RandomPositions.GetNextY(Ambient);
-                AddAgent(agent);
-                return;
+                if (Ambient[agent.X, agent.Y].Agent == null && Ambient[agent.X, agent.Y].Garbage == null)
+                {
+                    Ambient[agent.X, agent.Y].Agent = agent;
+                    UpdateInvalidCells();
+                    return;
+                }
+                else
+                {
+                    agent.X = RandomPositions.GetNextX(Ambient);
+                    agent.Y = RandomPositions.GetNextY(Ambient);
+                    AddAgent(agent);
+                    return;
+                }
             }
         }
 
@@ -128,6 +132,16 @@ namespace ColetorLixo.ViewModels
                     }
                 }
             }
+        }
+
+        private Boolean HasEmptyCell()
+        {
+            for (int i = 0; i < Ambient.GetLength(0); i++)
+                for (int j = 0; j < Ambient.GetLength(1); j++)
+                    if (Ambient[i, j].Agent == null)
+                        return true;
+
+            return false;
         }
 
         #endregion

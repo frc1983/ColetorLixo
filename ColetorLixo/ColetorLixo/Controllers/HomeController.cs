@@ -12,7 +12,11 @@ namespace ColetorLixo.Controllers
 {
     public class HomeController : Controller
     {
-        private MatrixViewModel matrixVM;  
+        private MatrixViewModel matrixVM;
+        private const int INITIAL_COLLECTOR_CHARGE = 10;
+        private const int CHARGER_RECHARGE_SIZE = 20;
+        private const int COLLECTOR_GARBAGE_CAPACITY = 10;
+        private const int TRASH_CAPACITY = 10;
 
         public ActionResult Index()
         {
@@ -32,7 +36,7 @@ namespace ColetorLixo.Controllers
             //matrixVM.AddTrash(RandomPositions.GetNextX(matrixVM.Ambient), RandomPositions.GetNextY(matrixVM.Ambient), EnumGarbageType.Plastic);
             //matrixVM.AddTrash(RandomPositions.GetNextX(matrixVM.Ambient), RandomPositions.GetNextY(matrixVM.Ambient), EnumGarbageType.Glass);
 
-            matrixVM.AddCharger(RandomPositions.GetNextX(matrixVM.Ambient), RandomPositions.GetNextY(matrixVM.Ambient), 10);
+            //matrixVM.AddCharger(RandomPositions.GetNextX(matrixVM.Ambient), RandomPositions.GetNextY(matrixVM.Ambient), 10);
 
             //matrixVM.AddGarbage(RandomPositions.GetNextX(matrixVM.Ambient), RandomPositions.GetNextY(matrixVM.Ambient), EnumGarbageType.Glass);
             //matrixVM.AddGarbage(RandomPositions.GetNextX(matrixVM.Ambient), RandomPositions.GetNextY(matrixVM.Ambient), EnumGarbageType.Plastic);
@@ -40,8 +44,8 @@ namespace ColetorLixo.Controllers
             //matrixVM.AddGarbage(RandomPositions.GetNextX(matrixVM.Ambient), RandomPositions.GetNextY(matrixVM.Ambient), EnumGarbageType.Metal);
 
             ////Importante deixar por ultimo para existirem todas lixeiras e carregadores
-            matrixVM.AddCollector(RandomPositions.GetNextX(matrixVM.Ambient), RandomPositions.GetNextY(matrixVM.Ambient), 10, 10);
-            matrixVM.AddCollector(RandomPositions.GetNextX(matrixVM.Ambient), RandomPositions.GetNextY(matrixVM.Ambient), 10, 5);
+            //matrixVM.AddCollector(RandomPositions.GetNextX(matrixVM.Ambient), RandomPositions.GetNextY(matrixVM.Ambient), 10, 10);
+            //matrixVM.AddCollector(RandomPositions.GetNextX(matrixVM.Ambient), RandomPositions.GetNextY(matrixVM.Ambient), 10, 5);
 
             return View();
         }
@@ -50,7 +54,7 @@ namespace ColetorLixo.Controllers
         {
             GetMatrix();
 
-            //Pega todos coletores e move eles
+            //Pega cada coletor e move ele
             List<Cell> collectors = matrixVM.GetCollectors();
             foreach (Cell colCell in collectors)
                 ((Collector)colCell.Agent).MoveCollector(matrixVM, colCell);
@@ -86,20 +90,22 @@ namespace ColetorLixo.Controllers
 
             if (EnumGarbageType.TryParse(garbage, out garbageType))
             {
+                int randomX = RandomPositions.GetNextX(matrixVM.Ambient),
+                    randomY = RandomPositions.GetNextY(matrixVM.Ambient);
                 result = new { Message = "OK" };
                 switch (type)
                 {
                     case "COLLECTOR":
-                        matrixVM.AddCollector(RandomPositions.GetNextX(matrixVM.Ambient), RandomPositions.GetNextY(matrixVM.Ambient), 10, 10);
+                        matrixVM.AddCollector(randomX, randomY, INITIAL_COLLECTOR_CHARGE, COLLECTOR_GARBAGE_CAPACITY);
                         return new JsonResult() { Data = result, JsonRequestBehavior = JsonRequestBehavior.AllowGet };
                     case "TRASH":
-                        matrixVM.AddTrash(RandomPositions.GetNextX(matrixVM.Ambient), RandomPositions.GetNextY(matrixVM.Ambient), 10, garbageType);
+                        matrixVM.AddTrash(randomX, randomY, TRASH_CAPACITY, garbageType);
                         return new JsonResult() { Data = result, JsonRequestBehavior = JsonRequestBehavior.AllowGet };
                     case "CHARGER":
-                        matrixVM.AddCharger(RandomPositions.GetNextX(matrixVM.Ambient), RandomPositions.GetNextY(matrixVM.Ambient), 6);
+                        matrixVM.AddCharger(randomX, randomY, CHARGER_RECHARGE_SIZE);
                         return new JsonResult() { Data = result, JsonRequestBehavior = JsonRequestBehavior.AllowGet };
                     case "GARBAGE":
-                        matrixVM.AddGarbage(RandomPositions.GetNextX(matrixVM.Ambient), RandomPositions.GetNextY(matrixVM.Ambient), garbageType);
+                        matrixVM.AddGarbage(randomX, randomY, garbageType);
                         return new JsonResult() { Data = result, JsonRequestBehavior = JsonRequestBehavior.AllowGet };
                 }
             }

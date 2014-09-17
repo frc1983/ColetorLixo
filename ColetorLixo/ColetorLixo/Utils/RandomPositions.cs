@@ -10,14 +10,39 @@ namespace ColetorLixo.Utils
 {
     public class RandomPositions : Controller
     {
+        private static readonly Random _global = new Random();
+
+        [ThreadStatic]
+        private static Random _local;
+
         public static int GetNextX(Cell[,] ambient)
         {
-            return new Random().Next(0, ambient.GetLength(0));
+            if (_local == null)
+            {
+                int seed;
+                lock (_global)
+                {
+                    seed = _global.Next(0, ambient.GetLength(0));
+                }
+                _local = new Random(seed);
+            }
+
+            return _local.Next(0, ambient.GetLength(0));
         }
 
         public static int GetNextY(Cell[,] ambient)
         {
-            return new Random().Next(0, ambient.GetLength(1));
+            if (_local == null)
+            {
+                int seed;
+                lock (_global)
+                {
+                    seed = _global.Next(0, ambient.GetLength(1));
+                }
+                _local = new Random(seed);
+            }
+
+            return _local.Next(0, ambient.GetLength(1));
         }
     }
 }

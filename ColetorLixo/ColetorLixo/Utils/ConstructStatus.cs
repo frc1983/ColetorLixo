@@ -23,8 +23,9 @@ namespace ColetorLixo.Utils
                 if (agent.AgentType == EnumAgentType.COLLECTOR)
                 {
                     matrixVM.Status.Append("Bateria: " + ((Collector)agent).BatteryLevel + "<br />");
+                    matrixVM.Status.Append("Capacidade de lixo? " + ((Collector)agent).GarbageCapacity + "<br />");
                     matrixVM.Status.Append("Cheio de lixo? " + ((Collector)agent).FullLoad + "<br />");
-                    matrixVM.Status.Append("Lixos dentro:<br />");
+                    matrixVM.Status.Append("Lixos dentro: " + ((Collector)agent).GarbageInside.Count + "<br />");
                     foreach (Garbage garbage in ((Collector)agent).GarbageInside.OrderBy(x => x.GarbageType))
                         matrixVM.Status.Append("    Tipo: " + garbage.GarbageType + "<br />");
                 }
@@ -32,6 +33,8 @@ namespace ColetorLixo.Utils
                 {
                     matrixVM.Status.Append("Lixeira de: " + ((Trash)agent).GarbageType + "<br />");
                     matrixVM.Status.Append("Posição: " + ((Trash)agent).X + ", " + ((Trash)agent).Y + "<br />");
+                    matrixVM.Status.Append("Capacidade de lixo? " + ((Trash)agent).GarbageCapacity + "<br />");
+                    matrixVM.Status.Append("Lixos dentro: " + ((Trash)agent).GarbageLoad + "<br />");
                     matrixVM.Status.Append("Está cheia? " + ((Trash)agent).FullLoad + "<br />");
                 }
                 else if (agent.AgentType == EnumAgentType.CHARGER)
