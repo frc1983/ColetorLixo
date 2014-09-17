@@ -16,7 +16,7 @@ namespace ColetorLixo.Controllers
 
         public ActionResult Index()
         {
-            matrixVM = new MatrixViewModel(15, 15);
+            matrixVM = new MatrixViewModel(5, 5);
 
             if (!string.IsNullOrEmpty(Request["X"]) && !string.IsNullOrEmpty(Request["Y"]) &&
                 Convert.ToInt32(Request["X"].ToString()) > 0 && Convert.ToInt32(Request["Y"].ToString()) > 0)
@@ -32,7 +32,7 @@ namespace ColetorLixo.Controllers
             //matrixVM.AddTrash(RandomPositions.GetNextX(matrixVM.Ambient), RandomPositions.GetNextY(matrixVM.Ambient), EnumGarbageType.Plastic);
             //matrixVM.AddTrash(RandomPositions.GetNextX(matrixVM.Ambient), RandomPositions.GetNextY(matrixVM.Ambient), EnumGarbageType.Glass);
 
-            //matrixVM.AddCharger(RandomPositions.GetNextX(matrixVM.Ambient), RandomPositions.GetNextY(matrixVM.Ambient));
+            matrixVM.AddCharger(RandomPositions.GetNextX(matrixVM.Ambient), RandomPositions.GetNextY(matrixVM.Ambient), 10);
 
             //matrixVM.AddGarbage(RandomPositions.GetNextX(matrixVM.Ambient), RandomPositions.GetNextY(matrixVM.Ambient), EnumGarbageType.Glass);
             //matrixVM.AddGarbage(RandomPositions.GetNextX(matrixVM.Ambient), RandomPositions.GetNextY(matrixVM.Ambient), EnumGarbageType.Plastic);
@@ -40,7 +40,8 @@ namespace ColetorLixo.Controllers
             //matrixVM.AddGarbage(RandomPositions.GetNextX(matrixVM.Ambient), RandomPositions.GetNextY(matrixVM.Ambient), EnumGarbageType.Metal);
 
             ////Importante deixar por ultimo para existirem todas lixeiras e carregadores
-            //matrixVM.AddCollector(RandomPositions.GetNextX(matrixVM.Ambient), RandomPositions.GetNextY(matrixVM.Ambient));
+            matrixVM.AddCollector(RandomPositions.GetNextX(matrixVM.Ambient), RandomPositions.GetNextY(matrixVM.Ambient), 10, 10);
+            matrixVM.AddCollector(RandomPositions.GetNextX(matrixVM.Ambient), RandomPositions.GetNextY(matrixVM.Ambient), 10, 5);
 
             return View();
         }

@@ -11,6 +11,7 @@ namespace ColetorLixo.Models
     {
         #region Properties
 
+        public Guid Id { get; set; }
         public int BatteryLevel { get; set; }
         public EnumCollectorStates ActualState { get; set; }
         public List<Garbage> GarbageInside { get; set; }
@@ -32,6 +33,7 @@ namespace ColetorLixo.Models
         public Collector(int x, int y, int capacity, int battery)
             : base(x, y, EnumAgentType.COLLECTOR, capacity)
         {
+            Id = Guid.NewGuid();
             BatteryLevel = battery;
             IsCharged = true;
             ActualState = EnumCollectorStates.LIMPAR;
@@ -302,14 +304,14 @@ namespace ColetorLixo.Models
         {
             //retorna o carregador mais proximo do coletor na lista de carregadores do coletor
             Charger nearest = Chargers
-                .Where(x => x.UsedPositionOne == null || x.UsedPositionTwo == null)
+                .Where(x => x.UsedPositions.Any(y => y == null))
                 .FirstOrDefault();
 
             if (nearest != null)
             {
                 //distancia do primeiro da lista
                 double d = CalculateDistance(actual, new Cell(nearest.X, nearest.Y));
-                foreach (Charger charger in Chargers.Where(x => x.UsedPositionOne == null || x.UsedPositionTwo == null))
+                foreach (Charger charger in Chargers.Where(x => x.UsedPositions.Count() < 2))
                 {
                     //verifica a distancia de cada carregador da lista
                     double distance = CalculateDistance(actual, new Cell(charger.X, charger.Y));

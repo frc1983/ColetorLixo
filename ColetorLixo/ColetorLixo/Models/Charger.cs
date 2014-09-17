@@ -7,30 +7,38 @@ namespace ColetorLixo.Models
 {
     public class Charger : Agent
     {
-        public Agent UsedPositionOne { get; set; }
-        public Agent UsedPositionTwo { get; set; }
+        public Collector[] UsedPositions { get; set; }
 
-        public Charger(int x, int y, int capacity) : base(x, y, EnumAgentType.CHARGER, capacity)
+        public Charger(int x, int y, int capacity)
+            : base(x, y, EnumAgentType.CHARGER, capacity)
         {
-            this.UsedPositionOne = null;
-            this.UsedPositionTwo = null;
+            this.UsedPositions = new Collector[2];
         }
 
         public Boolean HasEmptyPosition()
         {
-            return UsedPositionOne == null || UsedPositionTwo == null;
+            for (int i = 0; i < UsedPositions.Length; i++)
+                if (this.UsedPositions[i] == null)
+                    return true;
+
+            return false;
         }
 
         internal void SetAgentInCharge(Collector c)
         {
-            if (this.UsedPositionOne == null || this.UsedPositionOne == c) this.UsedPositionOne = c;
-            else if (this.UsedPositionTwo == null || this.UsedPositionTwo == c) this.UsedPositionTwo = c;
+            for (int i = 0; i < UsedPositions.Length; i++)
+                if (this.UsedPositions[i] == null && !this.UsedPositions.Any(x => x != null && x.Id == c.Id))
+                {
+                    this.UsedPositions[i] = c;
+                    break;
+                }
         }
 
         internal void UnsetAgentInCharge(Collector c)
         {
-            if (this.UsedPositionOne != null && this.UsedPositionOne == c) this.UsedPositionOne = null;
-            if (this.UsedPositionTwo != null && this.UsedPositionTwo == c) this.UsedPositionTwo = null;
+            for (int i = 0; i < UsedPositions.Length; i++)
+                if (this.UsedPositions[i] != null && this.UsedPositions[i].Id == c.Id)
+                    this.UsedPositions[i] = null;
         }
     }
 }
