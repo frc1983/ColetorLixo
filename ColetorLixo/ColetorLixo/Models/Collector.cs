@@ -68,7 +68,7 @@ namespace ColetorLixo.Models
 
             Cell next = null;
             var hasNextCell = this.NextCell != null;
-            if (NeedCharge(matrixVM, hasNextCell))
+            if (NeedCharge(matrixVM, hasNextCell,colCell))
             {
                 this.VisitedCells = new List<Cell>();
                 neighbors = GetNeighbors(colCell, matrixVM, false);
@@ -87,6 +87,7 @@ namespace ColetorLixo.Models
                     {
                         GoCharge(10, GetRoundNeighbors(colCell, neighbors).Where(x => ((Agent)x.Agent).AgentType.Equals(EnumAgentType.CHARGER)).Single());
                         this.NextCell = next;
+                        //adicionar função para carregar até o limite o coletor (senão o mesmo fica preso ao lado do carregador)
                     }
                 }
             }
@@ -265,19 +266,17 @@ namespace ColetorLixo.Models
 
         #region Charger Methods
 
-        private Boolean NeedCharge(MatrixViewModel matrixVM, Boolean need)
+        private Boolean NeedCharge(MatrixViewModel matrixVM, Boolean need, Cell colCell)
         {
-            if (need) return true;
+            //if (need) return true;
 
             Cell charger = FindNearestCharger(this);
 
             if (charger != null)
             {
-                var more = matrixVM.Ambient.GetLength(0);
-                if (matrixVM.Ambient.GetLength(1) > matrixVM.Ambient.GetLength(0))
-                    more = matrixVM.Ambient.GetLength(1);
+                int dist = CalculateDistance(colCell, charger);
 
-                if (BatteryLevel <= more)
+                if (BatteryLevel == dist)
                     return true;
             }
 
