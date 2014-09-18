@@ -87,7 +87,6 @@ namespace ColetorLixo.Models
                     {
                         GoCharge(10, GetRoundNeighbors(colCell, neighbors).Where(x => ((Agent)x.Agent).AgentType.Equals(EnumAgentType.CHARGER)).Single());
                         this.NextCell = next;
-                        //adicionar função para carregar até o limite o coletor (senão o mesmo fica preso ao lado do carregador)
                     }
                 }
             }
@@ -290,8 +289,10 @@ namespace ColetorLixo.Models
             if (c.HasEmptyPosition())
                 c.SetAgentInCharge(this);
 
-            if (BatteryLevel < charge)
-                BatteryLevel += 1;
+            if (BatteryLevel < charge){
+                while(BatteryLevel<charge){
+                this.BatteryLevel++;}
+            }
             else
             {
                 this.NextCell = null;

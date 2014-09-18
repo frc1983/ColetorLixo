@@ -14,8 +14,8 @@ namespace ColetorLixo.Controllers
     {
         private MatrixViewModel matrixVM;
         private const int INITIAL_COLLECTOR_CHARGE = 5;
-        private const int CHARGER_RECHARGE_SIZE = 20;
-        private const int COLLECTOR_GARBAGE_CAPACITY = 100;
+        private const int CHARGER_RECHARGE_SIZE = 10;
+        private const int COLLECTOR_GARBAGE_CAPACITY = 10;
         private const int TRASH_CAPACITY = 10;
 
         public ActionResult Index()
@@ -60,6 +60,7 @@ namespace ColetorLixo.Controllers
                 ((Collector)colCell.Agent).MoveCollector(matrixVM, colCell);
             
             return DrawTable(true);
+            //TODO: depois que recarrega entra em looping aqui....
         }
 
         public JsonResult DrawTable(bool? update)
