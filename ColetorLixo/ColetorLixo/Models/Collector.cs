@@ -68,7 +68,7 @@ namespace ColetorLixo.Models
 
             Cell next = null;
             var hasNextCell = this.NextCell != null;
-            if (NeedCharge(matrixVM, hasNextCell,colCell))
+            if (NeedCharge(matrixVM, hasNextCell))
             {
                 this.VisitedCells = new List<Cell>();
                 neighbors = GetNeighbors(colCell, matrixVM, false);
@@ -169,12 +169,12 @@ namespace ColetorLixo.Models
                 (
                     ((actual.X + 1).Equals(x.X) && actual.Y.Equals(x.Y)) ||
                     (actual.X == x.X && (actual.Y + 1).Equals(x.Y)) ||
+                    (actual.X == x.X && (actual.Y - 1).Equals(x.Y)) ||
+                    ((actual.X - 1).Equals(x.X) && actual.Y.Equals(x.Y)) ||
                     ((actual.X + 1).Equals(x.X) && (actual.Y + 1).Equals(x.Y)) ||
                     ((actual.X - 1).Equals(x.X) && (actual.Y + 1).Equals(x.Y)) ||
-                    ((actual.X - 1).Equals(x.X) && actual.Y.Equals(x.Y)) ||
                     ((actual.X - 1).Equals(x.X) && (actual.Y - 1).Equals(x.Y)) ||
                     ((actual.X - 1).Equals(x.X) && (actual.Y - 1).Equals(x.Y)) ||
-                    (actual.X == x.X && (actual.Y - 1).Equals(x.Y)) ||
                     ((actual.X + 1).Equals(x.X) && (actual.Y - 1).Equals(x.Y))
                 ));
 
@@ -188,12 +188,12 @@ namespace ColetorLixo.Models
                 (
                     ((actual.X + 1).Equals(x.X) && actual.Y.Equals(x.Y)) ||
                     (actual.X == x.X && (actual.Y + 1).Equals(x.Y)) ||
-                    ((actual.X + 1).Equals(x.X) && (actual.Y + 1).Equals(x.Y)) ||
-                    ((actual.X - 1).Equals(x.X) && (actual.Y + 1).Equals(x.Y)) ||
-                    ((actual.X - 1).Equals(x.X) && actual.Y.Equals(x.Y)) ||
-                    ((actual.X - 1).Equals(x.X) && (actual.Y - 1).Equals(x.Y)) ||
-                    ((actual.X - 1).Equals(x.X) && (actual.Y - 1).Equals(x.Y)) ||
                     (actual.X == x.X && (actual.Y - 1).Equals(x.Y)) ||
+                    ((actual.X - 1).Equals(x.X) && actual.Y.Equals(x.Y)) ||
+                    ((actual.X + 1).Equals(x.X) && (actual.Y + 1).Equals(x.Y)) ||
+                    ((actual.X - 1).Equals(x.X) && (actual.Y + 1).Equals(x.Y)) ||                    
+                    ((actual.X - 1).Equals(x.X) && (actual.Y - 1).Equals(x.Y)) ||
+                    ((actual.X - 1).Equals(x.X) && (actual.Y - 1).Equals(x.Y)) ||                    
                     ((actual.X + 1).Equals(x.X) && (actual.Y - 1).Equals(x.Y))
                 ));
 
@@ -265,18 +265,20 @@ namespace ColetorLixo.Models
 
         #region Charger Methods
 
-        private Boolean NeedCharge(MatrixViewModel matrixVM, Boolean need, Cell colCell)
+        private Boolean NeedCharge(MatrixViewModel matrixVM, Boolean need)
         {
-            //if (need) return true;
+            if (need) return true;
 
             Cell charger = FindNearestCharger(this);
 
             if (charger != null)
             {
-                int dist = CalculateDistance(colCell, charger);
-
-                if (BatteryLevel == dist)
-                    return true;
+                var more = matrixVM.Ambient.GetLength(0);
+                if (matrixVM.Ambient.GetLength(1) > matrixVM.Ambient.GetLength(0))
+                    more = matrixVM.Ambient.GetLength(1);
+ 
+                if (BatteryLevel <= more)
+                     return true;
             }
 
             return false;
@@ -289,10 +291,8 @@ namespace ColetorLixo.Models
             if (c.HasEmptyPosition())
                 c.SetAgentInCharge(this);
 
-            if (BatteryLevel < charge){
-                while(BatteryLevel<charge){
-                this.BatteryLevel++;}
-            }
+            if (BatteryLevel < charge)
+                BatteryLevel += 1;
             else
             {
                 this.NextCell = null;
