@@ -13,8 +13,8 @@ namespace ColetorLixo.Controllers
     public class HomeController : Controller
     {
         private MatrixViewModel matrixVM;
-        private const int INITIAL_COLLECTOR_CHARGE = 5;
-        private const int CHARGER_RECHARGE_SIZE = 10;
+        private const int INITIAL_COLLECTOR_CHARGE = 30;
+        private const int CHARGER_RECHARGE_SIZE = 30;
         private const int COLLECTOR_GARBAGE_CAPACITY = 10;
         private const int TRASH_CAPACITY = 10;
 

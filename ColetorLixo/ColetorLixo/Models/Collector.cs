@@ -78,14 +78,14 @@ namespace ColetorLixo.Models
                 if (hasNextCell)
                 {
                     next = this.NextCell;
-                    GoCharge(10, GetRoundNeighbors(colCell, neighbors).Where(x => ((Agent)x.Agent).AgentType.Equals(EnumAgentType.CHARGER)).Single());
+                    GoCharge(10, GetRoundNeighbors(colCell, neighbors).Where(x => ((Agent)x.Agent).AgentType.Equals(EnumAgentType.CHARGER)).FirstOrDefault());
                 }
                 else if (nearest != null)
                 {
                     next = MoveToObjectiveWithAStarAlg(colCell, new Cell(nearest.X, nearest.Y), possibleCell);
                     if (GetRoundNeighbors(colCell, neighbors).Any(x => ((Agent)x.Agent).AgentType.Equals(EnumAgentType.CHARGER)))
                     {
-                        GoCharge(10, GetRoundNeighbors(colCell, neighbors).Where(x => ((Agent)x.Agent).AgentType.Equals(EnumAgentType.CHARGER)).Single());
+                        GoCharge(10, GetRoundNeighbors(colCell, neighbors).Where(x => ((Agent)x.Agent).AgentType.Equals(EnumAgentType.CHARGER)).FirstOrDefault());
                         this.NextCell = next;
                     }
                 }
